@@ -119,7 +119,7 @@ public class UserService {
     }
 
     public void rejectFollowRequest(User loggedInUser, User requestUser) {
-        loggedInUser.getFollowRequests().remove(requestUser);
+        loggedInUser.getFollowRequestsSent().remove(requestUser);
         userRepository.update(loggedInUser);
     }
 

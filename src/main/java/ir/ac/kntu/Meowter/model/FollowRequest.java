@@ -2,6 +2,7 @@ package ir.ac.kntu.Meowter.model;
 
 import javax.persistence.*;
 
+
 @Entity
 @Table(name = "follow_requests")
 public class FollowRequest {
@@ -27,7 +28,7 @@ public class FollowRequest {
     public FollowRequest(User requester, User recipient) {
         this.requester = requester;
         this.recipient = recipient;
-        this.status = FollowRequestStatus.PENDING;
+        this.status = ir.ac.kntu.Meowter.model.FollowRequestStatus.PENDING;
     }
 
     public Long getId() {
@@ -61,10 +62,4 @@ public class FollowRequest {
     public void setStatus(FollowRequestStatus status) {
         this.status = status;
     }
-}
-
-enum FollowRequestStatus {
-    PENDING,
-    ACCEPTED,
-    REJECTED
 }

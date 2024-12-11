@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +38,6 @@ public class User {
     private LocalDateTime dateofbirth;
 
     @ManyToMany
-    @JsonIgnore
     @JoinTable(
             name = "user_followers",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -46,8 +46,7 @@ public class User {
     private List<User> followers;
 
     @ManyToMany(mappedBy = "followers")
-    @JsonIgnore
-    private List<User> following;
+    private List<User> following = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -237,7 +236,4 @@ public class User {
         this.followRequestsSent = followRequestsSent;
     }
 
-    public <E> List<E> getFollowRequests() {
-        return null;
-    }
 }

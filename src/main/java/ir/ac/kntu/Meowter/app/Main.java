@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        CliFormatter.printMeow();
         Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();
 
@@ -19,13 +20,11 @@ public class Main {
         Role role = null;
 
         if (loggedInUser != null) {
-            System.out.println("Welcome back, " + loggedInUser.getUsername() + "!");
+            System.out.println(CliFormatter.blueUnderlined("❇\uFE0F Welcome back, " + loggedInUser.getUsername() + "! ❇\uFE0F"));
             role = loggedInUser.getRole();
         }
 
         while (true) {
-            CliFormatter.printMeow();
-
             if (loggedInUser == null) {
                 System.out.println(CliFormatter.boldGreen("Welcome to Meowter!"));
                 System.out.println("1. 👤 User");

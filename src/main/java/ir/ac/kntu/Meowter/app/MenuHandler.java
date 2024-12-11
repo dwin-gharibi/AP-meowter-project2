@@ -3,6 +3,7 @@ package ir.ac.kntu.Meowter.app;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
+import ir.ac.kntu.Meowter.util.CliFormatter;
 
 import java.util.Scanner;
 
@@ -35,14 +36,14 @@ public class MenuHandler {
     public void displayUserMenu(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("User Menu:");
-            System.out.println("1. Settings");
-            System.out.println("2. Support Section");
-            System.out.println("3. Users Section");
-            System.out.println("4. Posts Section");
-            System.out.println("5. User Profile");
-            System.out.println("6. Log out");
-            System.out.println("7. Exit");
+            System.out.println(CliFormatter.bold("User Menu:"));
+            System.out.println(CliFormatter.boldYellow("1. Settings"));
+            System.out.println(CliFormatter.boldRed("2. Support Section"));
+            System.out.println(CliFormatter.green("3. Users Section"));
+            System.out.println(CliFormatter.magenta("4. Posts Section"));
+            System.out.println(CliFormatter.cyan("5. User Profile"));
+            System.out.println(CliFormatter.red("6. Log out"));
+            System.out.println(CliFormatter.blue("7. Exit"));
 
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();

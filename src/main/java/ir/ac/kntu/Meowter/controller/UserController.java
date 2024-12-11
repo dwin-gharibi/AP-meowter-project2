@@ -3,6 +3,8 @@ package ir.ac.kntu.Meowter.controller;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.model.FollowRequest;
+import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 
 import java.util.Scanner;
 
@@ -25,28 +27,54 @@ public class UserController {
             System.out.println("2. View Followers");
             System.out.println("3. View Followings");
             System.out.println("4. Search Users");
-            System.out.println("5. View Follow Requests");
-            System.out.println("6. Back to Main Menu");
+            System.out.println("5. Send Follow Request");
+            System.out.println("6. View Follow Requests (Received & Sent)");
+            System.out.println("7. Back to Main Menu");
             System.out.print("Choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+
+            String input = scanner.nextLine();
+
+            if (input.startsWith("#")) {
+                String targetUsername = input.substring(1);
+                User recipientUser = userService.searchUserByUsername(targetUsername);
+                if (recipientUser != null) {
+                    userService.sendFollowRequest(loggedInUser, recipientUser);
+                    System.out.println("Follow request sent to @" + recipientUser.getUsername());
+                } else {
+                    System.out.println("User not found.");
+                }
+                continue;
+
+            }
+
+            int choice = -1;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid option. Please try again.");
+                continue;
+            }
 
             switch (choice) {
                 case 1:
                     userService.getAllUsers().forEach(user -> {
                         System.out.println("Username: @" + user.getUsername() + " | Email: " + user.getEmail());
+                        System.out.println("Type #username to follow @" + user.getUsername());
                     });
                     break;
+
                 case 2:
                     loggedInUser.getFollowers().forEach(follower -> {
                         System.out.println("Follower: @" + follower.getUsername());
                     });
                     break;
+
                 case 3:
                     loggedInUser.getFollowing().forEach(following -> {
                         System.out.println("Following: @" + following.getUsername());
                     });
                     break;
+
                 case 4:
                     System.out.print("Enter username to search: ");
                     String searchTerm = scanner.nextLine();
@@ -60,22 +88,49 @@ public class UserController {
                         System.out.println("User not found.");
                     }
                     break;
+
                 case 5:
+                    System.out.print("Enter #username to follow: ");
+                    String targetUsername = scanner.nextLine().substring(1);
+                    User recipientUser = userService.searchUserByUsername(targetUsername);
+                    if (recipientUser != null) {
+                        userService.sendFollowRequest(loggedInUser, recipientUser);
+                        System.out.println("Follow request sent to @" + recipientUser.getUsername());
+                    } else {
+                        System.out.println("User not found.");
+                    }
+                    break;
+
+                case 6:
+                    System.out.println("Your Follow Requests (Sent & Received):");
+
                     userService.getFollowRequests(loggedInUser).forEach(request -> {
-                        System.out.println("Follow request from: @" + request.getUsername());
-                        System.out.print("Accept (y/n)? ");
-                        String response = scanner.nextLine();
-                        if ("y".equalsIgnoreCase(response)) {
-                            userService.acceptFollowRequest(loggedInUser, request);
-                            System.out.println("Follow request accepted.");
-                        } else {
-                            userService.rejectFollowRequest(loggedInUser, request);
-                            System.out.println("Follow request rejected.");
+                        String requesterUsername = request.getRequester().getUsername();
+                        String recipientUsername = request.getRecipient().getUsername();
+
+                        if (request.getRequester().equals(loggedInUser)) {
+                            System.out.println("Follow request sent to: @" + recipientUsername + " | Status: " + request.getStatus());
+                        } else if (request.getRecipient().equals(loggedInUser)) {
+                            System.out.println("Follow request received from: @" + requesterUsername + " | Status: " + request.getStatus());
+                        }
+
+                        if (request.getStatus() == FollowRequestStatus.PENDING && request.getRecipient().equals(loggedInUser)) {
+                            System.out.print("Accept (y/n)? ");
+                            String response = scanner.nextLine();
+                            if ("y".equalsIgnoreCase(response)) {
+                                userService.acceptFollowRequest(loggedInUser, request.getRequester());
+                                System.out.println("Follow request accepted.");
+                            } else {
+                                userService.rejectFollowRequest(loggedInUser, request.getRequester());
+                                System.out.println("Follow request rejected.");
+                            }
                         }
                     });
                     break;
-                case 6:
+
+                case 7:
                     return;
+
                 default:
                     System.out.println("Invalid option. Try again.");
                     break;

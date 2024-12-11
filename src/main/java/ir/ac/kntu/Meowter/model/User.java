@@ -23,9 +23,10 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
-    @Column(nullable = false)
+    @JsonIgnore
     private String bio;
 
     @Column(nullable = false)
@@ -43,9 +44,11 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
-    private List<User> followers;
+    @JsonIgnore
+    private List<User> followers = new ArrayList<>();
 
     @ManyToMany(mappedBy = "followers")
+    @JsonIgnore
     private List<User> following = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

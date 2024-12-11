@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.repository;
 
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.model.FollowRequest;
 import ir.ac.kntu.Meowter.util.HibernateUtil;
 
 import org.hibernate.Session;
@@ -92,8 +93,68 @@ public class UserRepository {
         return user;
     }
 
-    public List<User> getFollowRequests(User user) {
-        return null;
+    public void saveFollowRequest(FollowRequest followRequest) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            session.save(followRequest);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+        } finally {
+            session.close();
+        }
     }
+
+    public FollowRequest findFollowRequest(User requester, User recipient) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        FollowRequest followRequest = null;
+
+        try {
+            String hql = "FROM FollowRequest fr WHERE fr.requester = :requester AND fr.recipient = :recipient";
+            followRequest = session.createQuery(hql, FollowRequest.class)
+                    .setParameter("requester", requester)
+                    .setParameter("recipient", recipient)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return followRequest;
+    }
+
+    public List<FollowRequest> getFollowRequests(User user) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<FollowRequest> requests = null;
+
+        try {
+            String hql = "FROM FollowRequest fr WHERE fr.recipient = :user OR fr.requester = :user";
+            requests = session.createQuery(hql, FollowRequest.class)
+                    .setParameter("user", user)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return requests;
+    }
+
+    public void sendFollowRequest(User loggedInUser, User recipientUser) {
+        FollowRequest existingRequest = this.findFollowRequest(loggedInUser, recipientUser);
+        if (existingRequest != null) {
+            System.out.println("Follow request already exists.");
+            return;
+        }
+
+        FollowRequest followRequest = new FollowRequest(loggedInUser, recipientUser);
+        this.saveFollowRequest(followRequest);
+    }
+
 }
 

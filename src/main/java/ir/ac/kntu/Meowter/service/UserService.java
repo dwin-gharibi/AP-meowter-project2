@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.service;
 
+import ir.ac.kntu.Meowter.model.FollowRequest;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
@@ -107,8 +108,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<User> getFollowRequests(User user) {
+    public List<FollowRequest> getFollowRequests(User user) {
         return userRepository.getFollowRequests(user);
+    }
+
+    public void sendFollowRequest(User loggedInUser, User recipientUser)  {
+        userRepository.sendFollowRequest(loggedInUser, recipientUser);
     }
 
     public void acceptFollowRequest(User loggedInUser, User requestUser) {

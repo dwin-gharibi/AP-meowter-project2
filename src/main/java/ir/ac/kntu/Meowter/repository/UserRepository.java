@@ -64,6 +64,19 @@ public class UserRepository {
         return exists;
     }
 
+    public User findByUsername(String username) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        User user = null;
+        try {
+            user = session.createQuery("FROM User WHERE username = :username", User.class)
+                    .setParameter("username", username)
+                    .uniqueResult();
+        } finally {
+            session.close();
+        }
+        return user;
+    }
+
     public User findByEmail(String email) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         User user = null;

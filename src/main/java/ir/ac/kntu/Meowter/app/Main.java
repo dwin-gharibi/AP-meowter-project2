@@ -20,7 +20,7 @@ public class Main {
         Role role = null;
 
         if (loggedInUser != null) {
-            System.out.println(CliFormatter.blueUnderlined("❇\uFE0F Welcome back, " + loggedInUser.getUsername() + "! ❇\uFE0F"));
+            System.out.println(CliFormatter.blueUnderlined("❇\uFE0F Welcome back, @" + loggedInUser.getUsername() + "! ❇\uFE0F"));
             role = loggedInUser.getRole();
         }
 

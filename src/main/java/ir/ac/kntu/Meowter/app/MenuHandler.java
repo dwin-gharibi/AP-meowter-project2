@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.app;
 
+import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
@@ -49,32 +50,37 @@ public class MenuHandler {
             int choice = scanner.nextInt();
             scanner.nextLine();
 
-            switch (choice) {
-                case 1:
-                    displaySettings(loggedInUser);
-                    break;
-                case 2:
-                    displaySupportSection(loggedInUser);
-                    break;
-                case 3:
-                    displayUsersSection(loggedInUser);
-                    break;
-                case 4:
-                    displayPostsSection(loggedInUser);
-                    break;
-                case 5:
-                    displayUserProfile(loggedInUser);
-                    break;
-                case 6:
-                    loggedInUser = null;
-                    System.out.println("You have logged out.");
-                    return;
-                case 7:
-                    System.out.println("Goodbye!");
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Invalid option! Please try again.");
+            try{
+                switch (choice) {
+                    case 1:
+                        displaySettings(loggedInUser);
+                        break;
+                    case 2:
+                        displaySupportSection(loggedInUser);
+                        break;
+                    case 3:
+                        displayUsersSection(loggedInUser);
+                        break;
+                    case 4:
+                        displayPostsSection(loggedInUser);
+                        break;
+                    case 5:
+                        displayUserProfile(loggedInUser);
+                        break;
+                    case 6:
+                        loggedInUser = null;
+                        System.out.println("You have logged out.");
+                        return;
+                    case 7:
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                        break;
+                    default:
+                        throw new InvalidCommandException("Invalid option! Please try again.");
+                }
+            }
+            catch (Exception e) {
+                System.out.println(CliFormatter.boldRed(e.getMessage()));
             }
         }
     }

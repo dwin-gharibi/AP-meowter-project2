@@ -1,33 +1,21 @@
 <configuration>
-    <property name="hibernate.properties">hibernate.properties</property>
-    <!-- Suppress all Hibernate logs -->
-    <logger name="org.hibernate" level="ERROR"/>
+    <!-- Suppress Logback internal messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
-    <!-- Suppress Hibernate Validator logs -->
-    <logger name="org.hibernate.validator" level="ERROR"/>
-
-    <!-- Suppress the Hibernate connection pool warnings -->
-    <logger name="org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl" level="ERROR"/>
-
-    <!-- Suppress Hibernate SQL logging (optional) -->
-    <logger name="org.hibernate.SQL" level="ERROR"/>
-
-    <!-- Suppress Hibernate transaction logs (optional) -->
-    <logger name="org.hibernate.transaction" level="ERROR"/>
-    <logger name="org.hibernate" level="WARN"/>
-    <!-- Suppress Hibernate DDL and schema generation logs -->
-    <logger name="org.hibernate.tool.hbm2ddl" level="ERROR"/>
-
-    <!-- Root logger (optional: can log only errors or be silent) -->
-    <root level="ERROR">
-        <appender-ref ref="STDOUT"/>
-    </root>
-
-    <!-- Console appender to display logs -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Define Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- Set Logging Levels -->
+    <logger name="org.hibernate" level="ERROR" />
+    <logger name="org.hibernate.type" level="ERROR" />
+    <logger name="org.hibernate.SQL" level="OFF" />
+
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
 </configuration>

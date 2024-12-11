@@ -123,12 +123,14 @@ public class Main {
                         System.out.print("Enter your password: ");
                         String password = scanner.nextLine();
 
-                        loggedInUser = userService.register(username, email, password);
+                        try{
+                            loggedInUser = userService.register(username, email, password);
+                        } catch (Exception e) {
+                            System.out.println(CliFormatter.boldRed(e.getMessage()));
+                        }
+
                         if (loggedInUser != null) {
                             System.out.println("Registration successful! Please log in.");
-                            continue;
-                        } else {
-                            System.out.println("Registration failed. Email may already be in use.");
                             continue;
                         }
                     } else {

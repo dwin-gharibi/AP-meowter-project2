@@ -36,15 +36,17 @@ dependencies {
     implementation 'redis.clients:jedis:4.3.1'
 
     // JUnit for testing
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation platform('org.junit:junit-bom:5.9.1')
+    implementation 'org.junit.jupiter:junit-jupiter'
 
     // Code quality tools (optional for analysis)
-    testImplementation 'net.sourceforge.pmd:pmd-java:6.55.0'
-    testImplementation 'com.puppycrawl.tools:checkstyle:10.12.1'
+    implementation 'net.sourceforge.pmd:pmd-java:6.55.0'
+    implementation 'com.puppycrawl.tools:checkstyle:10.12.1'
 
-    testImplementation 'org.slf4j:slf4j-api:1.7.36'
-    testImplementation 'ch.qos.logback:logback-classic:1.2.11'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
+
+
 }
 
 test {

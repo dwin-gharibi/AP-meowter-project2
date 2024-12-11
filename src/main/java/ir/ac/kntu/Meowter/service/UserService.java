@@ -3,6 +3,7 @@ package ir.ac.kntu.Meowter.service;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.util.ValidationUtil;
 
 public class UserService {
 
@@ -52,6 +53,12 @@ public class UserService {
     }
 
     public User register(String username, String email, String password) {
+
+        ValidationUtil.validateUsername(username);
+        ValidationUtil.validateEmail(email);
+        ValidationUtil.validatePassword(password);
+
+
         if (userRepository.existsByEmail(email)) {
             return null;
         }

@@ -14,8 +14,26 @@ repositories {
 }
 
 dependencies {
+    // JPA API (Jakarta Persistence API)
+    implementation 'jakarta.persistence:jakarta.persistence-api:2.2.3'
+
+    // Hibernate Core for JPA functionality
+    implementation 'org.hibernate:hibernate-core:5.6.7.Final'
+
+    // MySQL Connector for database connection
+    implementation 'mysql:mysql-connector-java:8.0.28'
+
+    // Hibernate Validator for bean validation
+    implementation 'org.hibernate.validator:hibernate-validator:6.1.5.Final'
+
+    // Jakarta Transaction API
+    implementation 'jakarta.transaction:jakarta.transaction-api:2.0.1'
+
+    // JUnit for testing
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Code quality tools
     testImplementation 'net.sourceforge.pmd:pmd-java:6.55.0'
     testImplementation 'com.puppycrawl.tools:checkstyle:10.12.1'
 }

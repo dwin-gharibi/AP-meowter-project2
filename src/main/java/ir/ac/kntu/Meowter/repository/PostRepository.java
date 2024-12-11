@@ -113,5 +113,22 @@ public class PostRepository {
         session.close();
         return count;
     }
+
+    public List<Post> findAllPaginated(int page, int size) {
+        return null;
+    }
+
+    public void addLike(User user, Post post) {
+    }
+
+    public void addComment(User user, Post post, String content) {
+    }
+
+    public void removeComment(User user, Post post, long commentId) {
+    }
+
+    public void removeLike(User user, Post post) {
+
+    }
 }
 

@@ -92,5 +92,8 @@ public class UserRepository {
         return user;
     }
 
+    public List<User> getFollowRequests(User user) {
+        return null;
+    }
 }
 

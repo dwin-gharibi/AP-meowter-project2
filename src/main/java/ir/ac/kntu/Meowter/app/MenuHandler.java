@@ -17,10 +17,12 @@ public class MenuHandler {
 
     private UserService userService;
     private TicketController ticketController;
+    private UserController userController;
 
     public MenuHandler() {
         this.userService = new UserService();
         this.ticketController = new TicketController();
+        this.userController = new UserController();
     }
 
     public void displayMainMenu(User loggedInUser, Role role) {
@@ -66,7 +68,7 @@ public class MenuHandler {
                         ticketController.displayTicketSection(loggedInUser);
                         break;
                     case 3:
-                        displayUsersSection(loggedInUser);
+                        userController.displayUsersSection(loggedInUser);
                         break;
                     case 4:
                         displayPostsSection(loggedInUser);
@@ -97,9 +99,9 @@ public class MenuHandler {
 
         while (true) {
             System.out.println("Settings for: " + loggedInUser.getUsername());
-            System.out.println("1. Change Username");
-            System.out.println("2. Change Password");
-            System.out.println("3. Change Privacy Setting");
+            System.out.println("1. Change Username (" + loggedInUser.getUsername() + ")");
+            System.out.println("2. Change Password (" + loggedInUser.getPassword() + ")");
+            System.out.println("3. Change Privacy Setting (" + loggedInUser.getIsPrivate() + ")");
             System.out.println("4. Go Back");
 
             System.out.print("Choose an option: ");
@@ -141,10 +143,6 @@ public class MenuHandler {
 
     private void displaySupportSection(User loggedInUser) {
         System.out.println("Support Section");
-    }
-
-    private void displayUsersSection(User loggedInUser) {
-        System.out.println("Users Section");
     }
 
     private void displayPostsSection(User loggedInUser) {

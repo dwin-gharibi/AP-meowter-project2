@@ -3,6 +3,8 @@ package ir.ac.kntu.Meowter.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,11 +25,16 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+    private String bio;
+
+    @Column(nullable = false)
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Post> posts;
+
+    private LocalDateTime dateofbirth;
 
     @ManyToMany
     @JsonIgnore
@@ -63,12 +70,36 @@ public class User {
         this.active = true;
     }
 
+    public boolean getIsPrivate() {
+        return isPrivate;
+    }
+
+    public void setIsPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getBio(){
+        return bio;
+    }
+
+    public LocalDateTime getDateofbirth() {
+        return dateofbirth;
+    }
+
+    public void setDateofbirth(LocalDateTime dateofbirth) {
+        this.dateofbirth = dateofbirth;
+    }
+
+    public void setBio(String bio){
+        this.bio = bio;
     }
 
     public boolean isPrivate() {
@@ -180,5 +211,33 @@ public class User {
 
     public void removeLike(Like like) {
         this.likes.remove(like);
+    }
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<FollowRequest> followRequestsReceived;
+
+    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<FollowRequest> followRequestsSent;
+
+    public List<FollowRequest> getFollowRequestsReceived() {
+        return followRequestsReceived;
+    }
+
+    public void setFollowRequestsReceived(List<FollowRequest> followRequestsReceived) {
+        this.followRequestsReceived = followRequestsReceived;
+    }
+
+    public List<FollowRequest> getFollowRequestsSent() {
+        return followRequestsSent;
+    }
+
+    public void setFollowRequestsSent(List<FollowRequest> followRequestsSent) {
+        this.followRequestsSent = followRequestsSent;
+    }
+
+    public <E> List<E> getFollowRequests() {
+        return null;
     }
 }

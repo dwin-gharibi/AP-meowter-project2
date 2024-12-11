@@ -1,11 +1,9 @@
 package ir.ac.kntu.Meowter.util;
 
+import ir.ac.kntu.Meowter.model.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import ir.ac.kntu.Meowter.model.User;
-import ir.ac.kntu.Meowter.model.Post;
-import ir.ac.kntu.Meowter.model.Like;
-import ir.ac.kntu.Meowter.model.Comment;
+
 
 public class HibernateUtil {
 
@@ -19,6 +17,8 @@ public class HibernateUtil {
                     .addAnnotatedClass(Post.class)
                     .addAnnotatedClass(Like.class)
                     .addAnnotatedClass(Comment.class)
+                    .addAnnotatedClass(Ticket.class)
+                    .addAnnotatedClass(FollowRequest.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);

@@ -1,35 +1,31 @@
 package ir.ac.kntu.Meowter.model;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ticket")
+@Table(name = "tickets")
 public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TicketSubject subject;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TicketStatus status;
-
-    @Column
-    private String response;
-
-    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false)
-    private Date createdAt;
+    private String response;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatus status;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     public Ticket() {}
 
@@ -38,15 +34,15 @@ public class Ticket {
         this.subject = subject;
         this.username = username;
         this.status = TicketStatus.SUBMITTED;
-        this.createdAt = new Date();
-        this.response = "";
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,22 +62,6 @@ public class Ticket {
         this.subject = subject;
     }
 
-    public TicketStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TicketStatus status) {
-        this.status = status;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -90,11 +70,35 @@ public class Ticket {
         this.username = username;
     }
 
-    public Date getCreatedAt() {
+    public String getResponse() {
+        return response == null ? "There is no response yet." : response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public TicketStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TicketStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

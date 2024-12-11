@@ -1,0 +1,38 @@
+package ir.ac.kntu.Meowter.service;
+
+import ir.ac.kntu.Meowter.model.Ticket;
+import ir.ac.kntu.Meowter.model.TicketStatus;
+import ir.ac.kntu.Meowter.model.TicketSubject;
+import ir.ac.kntu.Meowter.repository.TicketRepository;
+
+import java.util.List;
+
+public class TicketService {
+
+    private final TicketRepository ticketRepository;
+
+    public TicketService() {
+        this.ticketRepository = new TicketRepository();
+    }
+
+    public Ticket createTicket(String description, TicketSubject subject, String username) {
+        Ticket ticket = new Ticket(description, subject, username);
+        ticketRepository.save(ticket);
+        return ticket;
+    }
+
+    public List<Ticket> getUserTickets(String username) {
+        return ticketRepository.findByUsername(username);
+    }
+
+    public void respondToTicket(Ticket ticket, String response) {
+        ticket.setResponse(response);
+        ticket.setStatus(TicketStatus.PENDING);
+        ticketRepository.update(ticket);
+    }
+
+    public void closeTicket(Ticket ticket) {
+        ticket.setStatus(TicketStatus.CLOSED);
+        ticketRepository.update(ticket);
+    }
+}

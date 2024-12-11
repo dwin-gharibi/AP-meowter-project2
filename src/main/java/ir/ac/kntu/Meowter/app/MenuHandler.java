@@ -3,7 +3,12 @@ package ir.ac.kntu.Meowter.app;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.service.UserService;
+import ir.ac.kntu.Meowter.controller.AdminController;
+import ir.ac.kntu.Meowter.controller.UserController;
+import ir.ac.kntu.Meowter.controller.SupportController;
+import ir.ac.kntu.Meowter.controller.TicketController;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 
 import java.util.Scanner;
@@ -11,9 +16,11 @@ import java.util.Scanner;
 public class MenuHandler {
 
     private UserService userService;
+    private TicketController ticketController;
 
     public MenuHandler() {
         this.userService = new UserService();
+        this.ticketController = new TicketController();
     }
 
     public void displayMainMenu(User loggedInUser, Role role) {
@@ -56,7 +63,7 @@ public class MenuHandler {
                         displaySettings(loggedInUser);
                         break;
                     case 2:
-                        displaySupportSection(loggedInUser);
+                        ticketController.displayTicketSection(loggedInUser);
                         break;
                     case 3:
                         displayUsersSection(loggedInUser);

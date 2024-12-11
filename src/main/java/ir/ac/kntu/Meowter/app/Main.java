@@ -59,46 +59,82 @@ public class Main {
 
                 loggedInUser = null;
 
-                System.out.println("1. 🔒 Login");
-                System.out.println("2. 📝 Register");
-                System.out.print("Choose an option: ");
-                int choice = scanner.nextInt();
-                scanner.nextLine();
+                if (role == Role.ADMIN || role == Role.SUPPORT) {
+                    System.out.println("1. 🔒 Login");
+                    System.out.print("Choose an option: ");
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
 
-                if (choice == 1) {
-                    System.out.print("Enter your email: ");
-                    String email = scanner.nextLine();
-                    System.out.print("Enter your password: ");
-                    String password = scanner.nextLine();
+                    if (choice == 1) {
+                        System.out.print("Enter your email or username: ");
+                        String username = scanner.nextLine();
+                        System.out.print("Enter your password: ");
+                        String password = scanner.nextLine();
 
-                    loggedInUser = userService.login(email, password);
-                    if (loggedInUser != null) {
-                        System.out.println("Login successful!");
-                        SessionManager.saveSession(loggedInUser);
+                        if (username.contains("@")) {
+                            loggedInUser = userService.loginWithEmail(username, password);
+                        } else {
+                            loggedInUser = userService.loginWithUsername(username, password);
+                        }
+
+                        if (loggedInUser != null) {
+                            System.out.println("Login successful!");
+                            SessionManager.saveSession(loggedInUser);
+                        } else {
+                            System.out.println("Invalid email/username or password.");
+                            continue;
+                        }
                     } else {
-                        System.out.println("Invalid email or password.");
-                        continue;
-                    }
-
-                } else if (choice == 2) {
-                    System.out.print("Enter a username: ");
-                    String username = scanner.nextLine();
-                    System.out.print("Enter your email: ");
-                    String email = scanner.nextLine();
-                    System.out.print("Enter your password: ");
-                    String password = scanner.nextLine();
-
-                    loggedInUser = userService.register(username, email, password);
-                    if (loggedInUser != null) {
-                        System.out.println("Registration successful! Please log in.");
-                        continue;
-                    } else {
-                        System.out.println("Registration failed. Email may already be in use.");
+                        System.out.println("Invalid option. Please try again.");
                         continue;
                     }
                 } else {
-                    System.out.println("Invalid option. Please try again.");
-                    continue;
+                    System.out.println("1. 🔒 Login");
+                    System.out.println("2. 📝 Register");
+                    System.out.print("Choose an option: ");
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (choice == 1) {
+                        System.out.print("Enter your email or username: ");
+                        String username = scanner.nextLine();
+                        System.out.print("Enter your password: ");
+                        String password = scanner.nextLine();
+
+                        if (username.contains("@")) {
+                            loggedInUser = userService.loginWithEmail(username, password);
+                        } else {
+                            loggedInUser = userService.loginWithUsername(username, password);
+                        }
+
+                        if (loggedInUser != null) {
+                            System.out.println("Login successful!");
+                            SessionManager.saveSession(loggedInUser);
+                        } else {
+                            System.out.println("Invalid email/username or password.");
+                            continue;
+                        }
+
+                    } else if (choice == 2) {
+                        System.out.print("Enter a username: ");
+                        String username = scanner.nextLine();
+                        System.out.print("Enter your email: ");
+                        String email = scanner.nextLine();
+                        System.out.print("Enter your password: ");
+                        String password = scanner.nextLine();
+
+                        loggedInUser = userService.register(username, email, password);
+                        if (loggedInUser != null) {
+                            System.out.println("Registration successful! Please log in.");
+                            continue;
+                        } else {
+                            System.out.println("Registration failed. Email may already be in use.");
+                            continue;
+                        }
+                    } else {
+                        System.out.println("Invalid option. Please try again.");
+                        continue;
+                    }
                 }
 
             } else {

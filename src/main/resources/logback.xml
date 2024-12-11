@@ -1,5 +1,5 @@
 <configuration>
-
+    <property name="hibernate.properties">hibernate.properties</property>
     <!-- Suppress all Hibernate logs -->
     <logger name="org.hibernate" level="ERROR"/>
 
@@ -14,7 +14,7 @@
 
     <!-- Suppress Hibernate transaction logs (optional) -->
     <logger name="org.hibernate.transaction" level="ERROR"/>
-
+    <logger name="org.hibernate" level="WARN"/>
     <!-- Suppress Hibernate DDL and schema generation logs -->
     <logger name="org.hibernate.tool.hbm2ddl" level="ERROR"/>
 

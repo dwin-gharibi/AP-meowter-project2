@@ -1,0 +1,33 @@
+<configuration>
+
+    <!-- Suppress all Hibernate logs -->
+    <logger name="org.hibernate" level="ERROR"/>
+
+    <!-- Suppress Hibernate Validator logs -->
+    <logger name="org.hibernate.validator" level="ERROR"/>
+
+    <!-- Suppress the Hibernate connection pool warnings -->
+    <logger name="org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl" level="ERROR"/>
+
+    <!-- Suppress Hibernate SQL logging (optional) -->
+    <logger name="org.hibernate.SQL" level="ERROR"/>
+
+    <!-- Suppress Hibernate transaction logs (optional) -->
+    <logger name="org.hibernate.transaction" level="ERROR"/>
+
+    <!-- Suppress Hibernate DDL and schema generation logs -->
+    <logger name="org.hibernate.tool.hbm2ddl" level="ERROR"/>
+
+    <!-- Root logger (optional: can log only errors or be silent) -->
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <!-- Console appender to display logs -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+</configuration>

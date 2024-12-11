@@ -1,4 +1,143 @@
 package ir.ac.kntu.Meowter.app;
 
+import ir.ac.kntu.Meowter.model.Role;
+import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.service.UserService;
+
+import java.util.Scanner;
+
 public class MenuHandler {
+
+    private UserService userService;
+
+    public MenuHandler() {
+        this.userService = new UserService();
+    }
+
+    public void displayMainMenu(User loggedInUser, Role role) {
+        Scanner scanner = new Scanner(System.in);
+
+        if (role == Role.USER) {
+            displayUserMenu(loggedInUser);
+        } else if (role == Role.ADMIN) {
+            displayAdminMenu(loggedInUser);
+        } else if (role == Role.SUPPORT) {
+            displaySupportUserMenu(loggedInUser);
+        }
+    }
+
+    private void displaySupportUserMenu(User loggedInUser) {
+    }
+
+    private void displayAdminMenu(User loggedInUser) {
+    }
+
+    public void displayUserMenu(User loggedInUser) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("User Menu:");
+            System.out.println("1. Settings");
+            System.out.println("2. Support Section");
+            System.out.println("3. Users Section");
+            System.out.println("4. Posts Section");
+            System.out.println("5. User Profile");
+            System.out.println("6. Log out");
+            System.out.println("7. Exit");
+
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    displaySettings(loggedInUser);
+                    break;
+                case 2:
+                    displaySupportSection(loggedInUser);
+                    break;
+                case 3:
+                    displayUsersSection(loggedInUser);
+                    break;
+                case 4:
+                    displayPostsSection(loggedInUser);
+                    break;
+                case 5:
+                    displayUserProfile(loggedInUser);
+                    break;
+                case 6:
+                    loggedInUser = null;
+                    System.out.println("You have logged out.");
+                    return;
+                case 7:
+                    System.out.println("Goodbye!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid option! Please try again.");
+            }
+        }
+    }
+
+    public void displaySettings(User loggedInUser) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Settings for: " + loggedInUser.getUsername());
+            System.out.println("1. Change Username");
+            System.out.println("2. Change Password");
+            System.out.println("3. Change Privacy Setting");
+            System.out.println("4. Go Back");
+
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter new username: ");
+                    String newUsername = scanner.nextLine();
+                    loggedInUser = userService.updateUsername(loggedInUser, newUsername);
+                    System.out.println("Username updated successfully.");
+                    break;
+
+                case 2:
+                    System.out.print("Enter new password: ");
+                    String newPassword = scanner.nextLine();
+                    loggedInUser = userService.updatePassword(loggedInUser, newPassword);
+                    System.out.println("Password updated successfully.");
+                    break;
+
+                case 3:
+                    System.out.print("Make your profile private? (true/false): ");
+                    boolean isPrivate = scanner.nextBoolean();
+                    scanner.nextLine();
+                    loggedInUser = userService.updatePrivacySetting(loggedInUser, isPrivate);
+                    System.out.println("Privacy setting updated successfully.");
+                    break;
+
+                case 4:
+                    return;
+
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+
+    private void displaySupportSection(User loggedInUser) {
+        System.out.println("Support Section");
+    }
+
+    private void displayUsersSection(User loggedInUser) {
+        System.out.println("Users Section");
+    }
+
+    private void displayPostsSection(User loggedInUser) {
+        System.out.println("Posts Section");
+    }
+
+    private void displayUserProfile(User loggedInUser) {
+        System.out.println("User Profile: " + loggedInUser.getUsername());
+    }
 }

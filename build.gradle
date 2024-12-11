@@ -6,7 +6,7 @@ group = 'ir.ac.kntu'
 version = '1.0-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '17'  // Use Java 17 for compatibility
 }
 
 repositories {
@@ -29,13 +29,22 @@ dependencies {
     // Jakarta Transaction API
     implementation 'jakarta.transaction:jakarta.transaction-api:2.0.1'
 
+    // Jackson Databind for JSON serialization/deserialization
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+
+    // Redis client for pub/sub
+    implementation 'redis.clients:jedis:4.3.1'
+
     // JUnit for testing
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    // Code quality tools
+    // Code quality tools (optional for analysis)
     testImplementation 'net.sourceforge.pmd:pmd-java:6.55.0'
     testImplementation 'com.puppycrawl.tools:checkstyle:10.12.1'
+
+    testImplementation 'org.slf4j:slf4j-api:1.7.36'
+    testImplementation 'ch.qos.logback:logback-classic:1.2.11'
 }
 
 test {

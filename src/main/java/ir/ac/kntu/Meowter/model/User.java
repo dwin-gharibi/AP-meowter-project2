@@ -1,5 +1,7 @@
 package ir.ac.kntu.Meowter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -11,10 +13,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = false, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = false, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -24,9 +26,11 @@ public class User {
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Post> posts;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_followers",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -35,6 +39,7 @@ public class User {
     private List<User> followers;
 
     @ManyToMany(mappedBy = "followers")
+    @JsonIgnore
     private List<User> following;
 
     @Enumerated(EnumType.STRING)
@@ -42,7 +47,11 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Like> likes;
+
+    @Column(nullable = false)
+    private boolean isPrivate;
 
     public User() {}
 
@@ -60,6 +69,14 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     public String getUsername() {

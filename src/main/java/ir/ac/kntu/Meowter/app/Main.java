@@ -1,4 +1,4 @@
-package ir.ac.kntu;
+package ir.ac.kntu.Meowter.app;
 
 public class Main {
 

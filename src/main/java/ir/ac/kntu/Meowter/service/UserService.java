@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.service;
 
 import ir.ac.kntu.Meowter.model.FollowRequest;
+import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
@@ -100,6 +101,30 @@ public class UserService {
         return newUser;
     }
 
+    public void removeFollower(User loggedInUser, User follower) {
+        if (loggedInUser.getFollowers().contains(follower)) {
+            loggedInUser.getFollowers().remove(follower);
+            follower.getFollowing().remove(loggedInUser);
+            userRepository.update(loggedInUser);
+            userRepository.update(follower);
+            System.out.println("Removed follower: @" + follower.getUsername());
+        } else {
+            System.out.println("Follower not found.");
+        }
+    }
+
+    public void unfollowUser(User loggedInUser, User userToUnfollow) {
+        if (loggedInUser.getFollowing().contains(userToUnfollow)) {
+            loggedInUser.getFollowing().remove(userToUnfollow);
+            userToUnfollow.getFollowers().remove(loggedInUser);
+            userRepository.update(loggedInUser);
+            userRepository.update(userToUnfollow);
+            System.out.println("Unfollowed: @" + userToUnfollow.getUsername());
+        } else {
+            System.out.println("You are not following @" + userToUnfollow.getUsername());
+        }
+    }
+
     public User searchUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -112,8 +137,39 @@ public class UserService {
         return userRepository.getFollowRequests(user);
     }
 
-    public void sendFollowRequest(User loggedInUser, User recipientUser)  {
-        userRepository.sendFollowRequest(loggedInUser, recipientUser);
+
+    public void sendFollowRequest(User loggedInUser, User recipientUser) {
+        FollowRequest existingRequest = userRepository.findFollowRequest(loggedInUser, recipientUser);
+        if (existingRequest != null) {
+            System.out.println("Follow request already exists.");
+            return;
+        }
+
+        FollowRequest followRequest = new FollowRequest(loggedInUser, recipientUser);
+
+        if (recipientUser.isPrivate()) {
+            userRepository.saveFollowRequest(followRequest);
+            System.out.println("Follow request sent to @" + recipientUser.getUsername());
+        } else {
+            acceptFollowRequest(loggedInUser, followRequest);
+            System.out.println("Follow request automatically accepted for public profile of @" + recipientUser.getUsername());
+        }
+    }
+
+    public void acceptFollowRequest(User loggedInUser, FollowRequest followRequest) {
+        followRequest.setStatus(FollowRequestStatus.ACCEPTED);
+        userRepository.updateFollowRequest(loggedInUser, followRequest);
+
+        loggedInUser.followUser(followRequest.getRequester());
+        followRequest.getRequester().followUser(loggedInUser);
+
+        System.out.println("Follow request accepted successfully.");
+    }
+
+    public void rejectFollowRequest(User loggedInUser, FollowRequest followRequest) {
+        followRequest.setStatus(FollowRequestStatus.REJECTED);
+        userRepository.updateFollowRequest(loggedInUser, followRequest);
+        System.out.println("Follow request rejected.");
     }
 
     public void acceptFollowRequest(User loggedInUser, User requestUser) {

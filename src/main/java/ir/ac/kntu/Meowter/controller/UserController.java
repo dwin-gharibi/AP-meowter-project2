@@ -3,7 +3,6 @@ package ir.ac.kntu.Meowter.controller;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.model.User;
-import ir.ac.kntu.Meowter.model.FollowRequest;
 import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 
 import java.util.Scanner;
@@ -29,7 +28,9 @@ public class UserController {
             System.out.println("4. Search Users");
             System.out.println("5. Send Follow Request");
             System.out.println("6. View Follow Requests (Received & Sent)");
-            System.out.println("7. Back to Main Menu");
+            System.out.println("7. Remove Follower");
+            System.out.println("8. Unfollow User");
+            System.out.println("9. Back to Main Menu");
             System.out.print("Choose an option: ");
 
             String input = scanner.nextLine();
@@ -44,7 +45,6 @@ public class UserController {
                     System.out.println("User not found.");
                 }
                 continue;
-
             }
 
             int choice = -1;
@@ -91,11 +91,11 @@ public class UserController {
 
                 case 5:
                     System.out.print("Enter #username to follow: ");
-                    String targetUsername = scanner.nextLine().substring(1);
-                    User recipientUser = userService.searchUserByUsername(targetUsername);
-                    if (recipientUser != null) {
-                        userService.sendFollowRequest(loggedInUser, recipientUser);
-                        System.out.println("Follow request sent to @" + recipientUser.getUsername());
+                    String targetUser = scanner.nextLine().substring(1);
+                    User recipient = userService.searchUserByUsername(targetUser);
+                    if (recipient != null) {
+                        userService.sendFollowRequest(loggedInUser, recipient);
+                        System.out.println("Follow request sent to @" + recipient.getUsername());
                     } else {
                         System.out.println("User not found.");
                     }
@@ -103,7 +103,6 @@ public class UserController {
 
                 case 6:
                     System.out.println("Your Follow Requests (Sent & Received):");
-
                     userService.getFollowRequests(loggedInUser).forEach(request -> {
                         String requesterUsername = request.getRequester().getUsername();
                         String recipientUsername = request.getRecipient().getUsername();
@@ -129,6 +128,28 @@ public class UserController {
                     break;
 
                 case 7:
+                    System.out.print("Enter the username of the follower to remove: ");
+                    String followerUsername = scanner.nextLine();
+                    User follower = userService.searchUserByUsername(followerUsername);
+                    if (follower != null) {
+                        userService.removeFollower(loggedInUser, follower);
+                    } else {
+                        System.out.println("Follower not found.");
+                    }
+                    break;
+
+                case 8:
+                    System.out.print("Enter the username of the user to unfollow: ");
+                    String unfollowUsername = scanner.nextLine();
+                    User unfollowUser = userService.searchUserByUsername(unfollowUsername);
+                    if (unfollowUser != null) {
+                        userService.unfollowUser(loggedInUser, unfollowUser);
+                    } else {
+                        System.out.println("User not found.");
+                    }
+                    break;
+
+                case 9:
                     return;
 
                 default:

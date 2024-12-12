@@ -145,6 +145,18 @@ public class UserRepository {
         return requests;
     }
 
+    public void updateFollowRequest(User loggedinuser, FollowRequest updatedRequest) {
+        List<FollowRequest> followRequests = getFollowRequests(loggedinuser);
+        for (int i = 0; i < followRequests.size(); i++) {
+            FollowRequest currentRequest = followRequests.get(i);
+            if (currentRequest.getId().equals(updatedRequest.getId())) {
+                followRequests.set(i, updatedRequest);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Follow request not found");
+    }
+
     public void sendFollowRequest(User loggedInUser, User recipientUser) {
         FollowRequest existingRequest = this.findFollowRequest(loggedInUser, recipientUser);
         if (existingRequest != null) {

@@ -2,7 +2,10 @@ package ir.ac.kntu.Meowter.app;
 
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.SupportService;
+import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.controller.*;
+
 
 import java.util.Scanner;
 
@@ -10,6 +13,12 @@ public class SupportMenuHandler {
 
     private final SupportService supportService = new SupportService();
     private final Scanner scanner = new Scanner(System.in);
+
+    private UserService userService = new UserService();
+    private TicketController ticketController = new TicketController();
+    private UserController userController = new UserController();
+    private PostController postController = new PostController();
+
 
     public void displaySupportMenu(User supportUser) {
         System.out.println(CliFormatter.boldGreen("Welcome to the Support Panel, " + supportUser.getUsername() + "!"));
@@ -29,10 +38,10 @@ public class SupportMenuHandler {
                     viewAllReports();
                     break;
                 case 2:
-                    respondToReport();
+                    ticketController.displayTicketSection(supportUser);
                     break;
                 case 3:
-                    assistUser();
+                    userController.displayUsersSection(supportUser);
                     break;
                 case 4:
                     System.out.println("Exiting Support Menu...");

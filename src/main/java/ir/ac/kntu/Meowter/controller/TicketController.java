@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.controller;
 
+import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.repository.TicketRepository;
 import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.model.Ticket;
@@ -27,8 +28,10 @@ public class TicketController {
             System.out.println("Ticket Section");
             System.out.println("1. Create Ticket");
             System.out.println("2. View My Tickets");
-            System.out.println("3. Respond to Ticket");
-            System.out.println("4. Close Ticket");
+            if (loggedInUser.getRole() == Role.SUPPORT){
+                System.out.println("3. Respond to Ticket");
+                System.out.println("4. Close Ticket");
+            }
             System.out.println("5. Back to User Menu");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();

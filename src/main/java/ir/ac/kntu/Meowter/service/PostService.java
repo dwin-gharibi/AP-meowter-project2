@@ -4,6 +4,9 @@ import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.PostRepository;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.BlacklistUtil;
+import ir.ac.kntu.Meowter.util.ContentModerationUtil;
 
 import java.util.List;
 import java.util.Scanner;
@@ -22,6 +25,13 @@ public class PostService {
         if (user.getId() == null) {
             userRepository.save(user);
         }
+
+        CliFormatter.printTypingEffect("Checking your post for violations...");
+        if (BlacklistUtil.containsBlacklistedWord(content) || ContentModerationUtil.containsHarmfulContent(content)) {
+            CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
+            return;
+        }
+
 
         Post post = new Post(content, user);
         postRepository.save(post);
@@ -122,6 +132,13 @@ public class PostService {
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("User must not be null and must have a valid ID.");
         }
+
+        CliFormatter.printTypingEffect("Checking your post for violations...");
+        if (BlacklistUtil.containsBlacklistedWord(content) || ContentModerationUtil.containsHarmfulContent(content)) {
+            CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
+            return;
+        }
+
 
         Post post = new Post(content, user);
         postRepository.save(post);

@@ -93,6 +93,18 @@ public class CliFormatter {
         System.out.println("\r" + message + " ✅");
     }
 
+    public static void printTypingEffect(String message) {
+        for (char c : message.toCharArray()) {
+            System.out.print(c);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println();
+    }
+
     public static void progressBar(String task, int totalSteps) {
         System.out.print(task + " ");
         for (int step = 0; step <= totalSteps; step++) {

@@ -25,43 +25,62 @@ public class UserController {
     }
 
     public void displayProfile(User LoggedInUser) {
-        CliFormatter.loadingSpinner("Getting user information and profile...");
+        CliFormatter.loadingSpinner(CliFormatter.boldGreen("Getting user information and profile..."));
 
         StringBuilder profileDetails = new StringBuilder();
 
-        profileDetails.append("👤 **Username**: ").append(LoggedInUser.getUsername()).append("\n");
-        profileDetails.append("📧 **Email**: ").append(LoggedInUser.getEmail()).append("\n");
-        profileDetails.append("📝 **Bio**: ").append(LoggedInUser.getBio() == null ? "No bio provided." : LoggedInUser.getBio()).append("\n");
-        profileDetails.append("🎂 **Date of Birth**: ").append(LoggedInUser.getDateofbirth() != null ? LoggedInUser.getDateofbirth().toLocalDate().toString() : "Not provided").append("\n");
+        profileDetails.append(CliFormatter.bold("👤 Username: ")).append(LoggedInUser.getUsername()).append("\n");
+        profileDetails.append(CliFormatter.bold("📧 Email: ")).append(LoggedInUser.getEmail()).append("\n");
+        profileDetails.append(CliFormatter.bold("📝 Bio: ")).append(LoggedInUser.getBio() == null ? "No bio provided." : LoggedInUser.getBio()).append("\n");
+        profileDetails.append(CliFormatter.bold("🎂 Date of Birth: ")).append(LoggedInUser.getDateofbirth() != null ? LoggedInUser.getDateofbirth().toLocalDate().toString() : "Not provided").append("\n");
 
-        profileDetails.append("🔒 **Private Profile**: ").append(LoggedInUser.getIsPrivate() ? "Yes" : "No").append("\n");
+        profileDetails.append(CliFormatter.bold("🔒 Private Profile: ")).append(LoggedInUser.getIsPrivate() ? "Yes" : "No").append("\n");
 
-        profileDetails.append("👥 **Followers**: ").append(LoggedInUser.getFollowers().size()).append("\n");
-        profileDetails.append("👣 **Following**: ").append(LoggedInUser.getFollowing().size()).append("\n");
+        profileDetails.append(CliFormatter.bold("👥 Followers: ")).append(LoggedInUser.getFollowers().size()).append("\n");
+        profileDetails.append(CliFormatter.bold("👣 Following: ")).append(LoggedInUser.getFollowing().size()).append("\n");
 
-//        if (LoggedInUser.posts != null && !LoggedInUser.posts.isEmpty()) {
-//            profileDetails.append("\n📸 **Posts**:\n");
-//            for (Post post : this.posts) {
-//                profileDetails.append("  - ").append(post.getContent()).append(" (👍 ").append(post.getLikes().size()).append(" Likes)\n");
-//            }
-//        } else {
-//            profileDetails.append("\n📸 **Posts**: No posts yet.\n");
-//        }
+        profileDetails.append(CliFormatter.bold("🛠️ Role: ")).append(LoggedInUser.getRole()).append("\n");
 
-        profileDetails.append("🛠️ **Role**: ").append(LoggedInUser.getRole()).append("\n");
-
-        profileDetails.append("✅ **Active**: ").append(LoggedInUser.isActive() ? "Yes" : "No").append("\n");
+        profileDetails.append(CliFormatter.bold("✅ Active: ")).append(LoggedInUser.isActive() ? "Yes" : "No").append("\n");
 
         System.out.println(profileDetails.toString());
 
-
         List<Post> posts = postService.getUserPosts(LoggedInUser);
-        if (posts.isEmpty()) {
-            System.out.println("You haven't created any posts yet.");
-        } else {
+
+        if (!posts.isEmpty()) {
+            profileDetails.append(CliFormatter.bold("\n📸 Posts:\n"));
             List<String> post_details = new ArrayList<>();
-            posts.forEach(post -> post_details.add("Post ID: " + post.getId() + " | Content: " + post.getContent()));
+
+            posts.forEach(post -> {
+                String postDetail = "Post ID: " + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
+                        "Content: " + CliFormatter.bold(post.getContent()) + "\n" +
+                        "Created At: " + CliFormatter.green(post.getCreatedAt().toString()) + "\n" +
+                        "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" +
+                        "Hashtags: " + (post.getHashtags().isEmpty()
+                        ? CliFormatter.red("No hashtags")
+                        : CliFormatter.cyan(post.getHashtags().toString())) + "\n" +
+                        "Comments:\n";
+
+                if (!post.getComments().isEmpty()) {
+                    StringBuilder commentsDetails = new StringBuilder();
+                    post.getComments().forEach(comment -> {
+                        commentsDetails.append("    - Comment by ")
+                                .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                .append(": ")
+                                .append(CliFormatter.cyan(comment.getContent()))
+                                .append("\n");
+                    });
+                    postDetail += commentsDetails.toString();
+                } else {
+                    postDetail += CliFormatter.red("    No comments yet.\n");
+                }
+
+                post_details.add(postDetail);
+            });
+
             PaginationUtil.paginate(post_details);
+        } else {
+            System.out.println(CliFormatter.red("\n📸 Posts: No posts yet.\n"));
         }
 
         Scanner scanner = new Scanner(System.in);

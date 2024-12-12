@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 
 @Entity
@@ -40,18 +42,19 @@ public class User {
     @JsonIgnore
     private LocalDateTime dateofbirth;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_followers",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
     @JsonIgnore
-    private List<User> followers = new ArrayList<>();
+    private Set<User> followers = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers")
+    @ManyToMany(mappedBy = "followers", fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<User> following = new ArrayList<>();
+    private Set<User> following = new HashSet<>();
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -59,7 +62,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Like> likes;
+    private Set<Like> likes = new HashSet<>();
+
 
     @Column(nullable = false)
     private boolean isPrivate;
@@ -156,19 +160,19 @@ public class User {
         this.posts = posts;
     }
 
-    public List<User> getFollowers() {
+    public Set<User> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<User> followers) {
+    public void setFollowers(Set<User> followers) {
         this.followers = followers;
     }
 
-    public List<User> getFollowing() {
+    public Set<User> getFollowing() {
         return following;
     }
 
-    public void setFollowing(List<User> following) {
+    public void setFollowing(Set<User> following) {
         this.following = following;
     }
 
@@ -180,11 +184,11 @@ public class User {
         this.role = role;
     }
 
-    public List<Like> getLikes() {
+    public Set<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<Like> likes) {
+    public void setLikes(Set<Like> likes) {
         this.likes = likes;
     }
 

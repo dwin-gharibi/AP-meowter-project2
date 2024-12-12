@@ -1,19 +1,40 @@
 package ir.ac.kntu.Meowter.app;
 
+import java.util.*;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.*;
 
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Main {
 
     public static void main(String[] args) {
 
 //        CliFormatter.progressBar("this is a sample text", 100);
+
+        List<String> data = Arrays.asList("apple", "apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple", "banana", "grape", "pineapple", "blueberry");
+        List<String> results = SearchUtil.search("app", data);
+        PaginationUtil.paginate(results);
+        List<String> items = IntStream.range(1, 101).mapToObj(String::valueOf).collect(Collectors.toList());
+        PaginationUtil.paginate(items);
+
+        List<String> headers = Arrays.asList("ID", "Name", "Role");
+        List<List<String>> data2 = Arrays.asList(
+                Arrays.asList("1", "Alice", "Admin"),
+                Arrays.asList("2", "Bob", "Support"),
+                Arrays.asList("3", "Charlie", "User")
+        );
+
+        String reportPath = HtmlReportGeneratorUtil.generateReport("User Report", headers, data2);
+        System.out.println("Report generated: " + reportPath);
+
 
         CliFormatter.printMeow();
         Scanner scanner = new Scanner(System.in);

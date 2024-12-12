@@ -158,7 +158,7 @@ public class UserService {
 
     public void acceptFollowRequest(User loggedInUser, FollowRequest followRequest) {
         followRequest.setStatus(FollowRequestStatus.ACCEPTED);
-        userRepository.updateFollowRequest(loggedInUser, followRequest);
+        userRepository.updateFollowRequest(followRequest);
 
         loggedInUser.followUser(followRequest.getRequester());
         followRequest.getRequester().followUser(loggedInUser);
@@ -166,9 +166,10 @@ public class UserService {
         System.out.println("Follow request accepted successfully.");
     }
 
+
     public void rejectFollowRequest(User loggedInUser, FollowRequest followRequest) {
         followRequest.setStatus(FollowRequestStatus.REJECTED);
-        userRepository.updateFollowRequest(loggedInUser, followRequest);
+        userRepository.updateFollowRequest(followRequest);
         System.out.println("Follow request rejected.");
     }
 

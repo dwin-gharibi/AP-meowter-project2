@@ -1,7 +1,8 @@
 package ir.ac.kntu.Meowter.repository;
 
-import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.model.FollowRequest;
+import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.util.HibernateUtil;
 
 import org.hibernate.Session;
@@ -93,21 +94,6 @@ public class UserRepository {
         return user;
     }
 
-    public void saveFollowRequest(FollowRequest followRequest) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = null;
-
-        try {
-            transaction = session.beginTransaction();
-            session.save(followRequest);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-        } finally {
-            session.close();
-        }
-    }
-
     public FollowRequest findFollowRequest(User requester, User recipient) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         FollowRequest followRequest = null;
@@ -118,13 +104,47 @@ public class UserRepository {
                     .setParameter("requester", requester)
                     .setParameter("recipient", recipient)
                     .uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             session.close();
         }
 
         return followRequest;
+    }
+
+    public void saveFollowRequest(FollowRequest followRequest) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            session.saveOrUpdate(followRequest);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void sendFollowRequest(User loggedInUser, User recipientUser) {
+        FollowRequest existingRequest = this.findFollowRequest(loggedInUser, recipientUser);
+        if (existingRequest != null) {
+            System.out.println("Follow request already exists.");
+            return;
+        }
+
+        FollowRequest followRequest = new FollowRequest(loggedInUser, recipientUser);
+
+        if (!recipientUser.getIsPrivate()) {
+            followRequest.setStatus(FollowRequestStatus.ACCEPTED);
+            System.out.println("Follow request auto-accepted for public profile.");
+        } else {
+            followRequest.setStatus(FollowRequestStatus.PENDING);
+            System.out.println("Follow request sent and waiting for approval.");
+        }
+
+        this.saveFollowRequest(followRequest);
     }
 
     public List<FollowRequest> getFollowRequests(User user) {
@@ -145,28 +165,23 @@ public class UserRepository {
         return requests;
     }
 
-    public void updateFollowRequest(User loggedinuser, FollowRequest updatedRequest) {
-        List<FollowRequest> followRequests = getFollowRequests(loggedinuser);
-        for (int i = 0; i < followRequests.size(); i++) {
-            FollowRequest currentRequest = followRequests.get(i);
-            if (currentRequest.getId().equals(updatedRequest.getId())) {
-                followRequests.set(i, updatedRequest);
-                return;
-            }
+
+    public void updateFollowRequest(FollowRequest followRequest) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            session.merge(followRequest);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
         }
-        throw new IllegalArgumentException("Follow request not found");
     }
 
-    public void sendFollowRequest(User loggedInUser, User recipientUser) {
-        FollowRequest existingRequest = this.findFollowRequest(loggedInUser, recipientUser);
-        if (existingRequest != null) {
-            System.out.println("Follow request already exists.");
-            return;
-        }
 
-        FollowRequest followRequest = new FollowRequest(loggedInUser, recipientUser);
-        this.saveFollowRequest(followRequest);
-    }
 
 }
-

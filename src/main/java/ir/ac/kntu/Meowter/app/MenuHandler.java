@@ -3,6 +3,7 @@ package ir.ac.kntu.Meowter.app;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.controller.AdminController;
@@ -20,12 +21,14 @@ public class MenuHandler {
     private TicketController ticketController;
     private UserController userController;
     private PostController postController;
+    private PostService postService;
 
     public MenuHandler() {
         this.userService = new UserService();
         this.ticketController = new TicketController();
         this.userController = new UserController();
         this.postController = new PostController();
+        this.postService = new PostService();
     }
 
     public void displayMainMenu(User loggedInUser, Role role) {
@@ -50,6 +53,7 @@ public class MenuHandler {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println(CliFormatter.bold("User Menu:"));
+            System.out.println(CliFormatter.boldYellow("0. Home"));
             System.out.println(CliFormatter.boldYellow("1. Settings"));
             System.out.println(CliFormatter.boldRed("2. Support Section"));
             System.out.println(CliFormatter.green("3. Users Section"));
@@ -64,6 +68,10 @@ public class MenuHandler {
 
             try{
                 switch (choice) {
+                    case 0:
+                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
+                        postService.subscribeToPosts();
+                        break;
                     case 1:
                         displaySettings(loggedInUser);
                         break;

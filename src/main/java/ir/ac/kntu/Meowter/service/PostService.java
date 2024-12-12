@@ -7,6 +7,8 @@ import ir.ac.kntu.Meowter.repository.UserRepository;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.BlacklistUtil;
 import ir.ac.kntu.Meowter.util.ContentModerationUtil;
+import ir.ac.kntu.Meowter.util.RedisUtil;
+import redis.clients.jedis.JedisPubSub;
 
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +17,7 @@ public class PostService {
 
     private PostRepository postRepository;
     private UserRepository userRepository;
+    private final RedisUtil redisUtil = new RedisUtil();
 
     public PostService() {
         this.postRepository = new PostRepository();
@@ -33,8 +36,21 @@ public class PostService {
         }
 
 
+        redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
+
+
         Post post = new Post(content, user);
         postRepository.save(post);
+    }
+
+
+    public void subscribeToPosts() {
+        redisUtil.subscribe("post_channel", new JedisPubSub() {
+            @Override
+            public void onMessage(String channel, String message) {
+                System.out.println("New post received: " + message);
+            }
+        });
     }
 
     public void viewAllPosts(int page, int size) {
@@ -138,6 +154,9 @@ public class PostService {
             CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
             return;
         }
+
+        redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
+
 
 
         Post post = new Post(content, user);

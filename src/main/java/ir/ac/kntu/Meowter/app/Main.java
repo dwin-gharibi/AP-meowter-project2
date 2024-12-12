@@ -17,6 +17,8 @@ public class Main {
 
     public static void main(String[] args) {
 
+
+
 //        CliFormatter.progressBar("this is a sample text", 100);
 
 //        List<String> data = Arrays.asList("apple", "apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple", "banana", "grape", "pineapple", "blueberry");

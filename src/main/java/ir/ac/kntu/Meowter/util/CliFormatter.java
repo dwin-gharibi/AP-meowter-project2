@@ -76,5 +76,42 @@ public class CliFormatter {
         System.out.println();
         System.out.println("   ~~~~~~~~~ Meowter ~~~~~~~~~");
     }
+
+    public static void loadingSpinner(String message) {
+        String[] spinnerFrames = {"|", "/", "-", "\\"};
+        System.out.print(message + " ");
+        for (int i = 0; i < 30; i++) {
+            System.out.print("\r" + message + " " + spinnerFrames[i % spinnerFrames.length]);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("\nLoading interrupted.");
+                return;
+            }
+        }
+        System.out.println("\r" + message + " ✅");
+    }
+
+    public static void progressBar(String task, int totalSteps) {
+        System.out.print(task + " ");
+        for (int step = 0; step <= totalSteps; step++) {
+            int percent = (step * 100) / totalSteps;
+            int completedBars = percent / 10;
+            int remainingBars = 10 - completedBars;
+
+            String progressBar = "[" + "=".repeat(completedBars) + " ".repeat(remainingBars) + "] " + percent + "%";
+
+            System.out.print("\r" + task + " " + progressBar);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("\nProgress interrupted.");
+                return;
+            }
+        }
+        System.out.println("\r" + task + " [==========] 100% ✅");
+    }
 }
 

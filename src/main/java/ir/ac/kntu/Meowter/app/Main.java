@@ -12,6 +12,9 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+
+//        CliFormatter.progressBar("this is a sample text", 100);
+
         CliFormatter.printMeow();
         Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();
@@ -71,19 +74,8 @@ public class Main {
                         System.out.print("Enter your password: ");
                         String password = scanner.nextLine();
 
-                        if (username.contains("@")) {
-                            loggedInUser = userService.loginWithEmail(username, password);
-                        } else {
-                            loggedInUser = userService.loginWithUsername(username, password);
-                        }
-
-                        if (loggedInUser != null) {
-                            System.out.println("Login successful!");
-                            SessionManager.saveSession(loggedInUser);
-                        } else {
-                            System.out.println("Invalid email/username or password.");
-                            continue;
-                        }
+                        loggedInUser = attemptLogin(userService, username, password, role);
+                        if (loggedInUser == null) continue;
                     } else {
                         System.out.println("Invalid option. Please try again.");
                         continue;
@@ -101,20 +93,8 @@ public class Main {
                         System.out.print("Enter your password: ");
                         String password = scanner.nextLine();
 
-                        if (username.contains("@")) {
-                            loggedInUser = userService.loginWithEmail(username, password);
-                        } else {
-                            loggedInUser = userService.loginWithUsername(username, password);
-                        }
-
-                        if (loggedInUser != null) {
-                            System.out.println("Login successful!");
-                            SessionManager.saveSession(loggedInUser);
-                        } else {
-                            System.out.println("Invalid email/username or password.");
-                            continue;
-                        }
-
+                        loggedInUser = attemptLogin(userService, username, password, Role.USER);
+                        if (loggedInUser == null) continue;
                     } else if (choice == 2) {
                         System.out.print("Enter a username: ");
                         String username = scanner.nextLine();
@@ -123,7 +103,7 @@ public class Main {
                         System.out.print("Enter your password: ");
                         String password = scanner.nextLine();
 
-                        try{
+                        try {
                             loggedInUser = userService.register(username, email, password);
                         } catch (Exception e) {
                             System.out.println(CliFormatter.boldRed(e.getMessage()));
@@ -132,7 +112,6 @@ public class Main {
                         if (loggedInUser != null) {
                             System.out.println(CliFormatter.boldGreen("Registration successful! You are now logged in."));
                             SessionManager.saveSession(loggedInUser);
-                            continue;
                         }
                     } else {
                         System.out.println("Invalid option. Please try again.");
@@ -141,8 +120,16 @@ public class Main {
                 }
 
             } else {
-                MenuHandler menuHandler = new MenuHandler();
-                menuHandler.displayMainMenu(loggedInUser, role);
+                if (role == Role.ADMIN) {
+                    AdminMenuHandler adminMenuHandler = new AdminMenuHandler();
+                    adminMenuHandler.displayAdminMenu(loggedInUser);
+                } else if (role == Role.SUPPORT) {
+                    SupportMenuHandler supportMenuHandler = new SupportMenuHandler();
+                    supportMenuHandler.displaySupportMenu(loggedInUser);
+                } else {
+                    MenuHandler menuHandler = new MenuHandler();
+                    menuHandler.displayMainMenu(loggedInUser, role);
+                }
 
                 System.out.println("Do you want to log out? (y/n): ");
                 String logoutChoice = scanner.nextLine();
@@ -153,5 +140,27 @@ public class Main {
                 }
             }
         }
+    }
+
+    private static User attemptLogin(UserService userService, String username, String password, Role expectedRole) {
+        User loggedInUser = null;
+        if (username.contains("@")) {
+            loggedInUser = userService.loginWithEmail(username, password);
+        } else {
+            loggedInUser = userService.loginWithUsername(username, password);
+        }
+
+        if (loggedInUser != null) {
+            if (loggedInUser.getRole() != expectedRole) {
+                System.out.println(CliFormatter.red("Access denied. You do not have the proper role to log in as " + expectedRole + "."));
+                loggedInUser = null;
+            } else {
+                System.out.println("Login successful!");
+                SessionManager.saveSession(loggedInUser);
+            }
+        } else {
+            System.out.println("Invalid email/username or password.");
+        }
+        return loggedInUser;
     }
 }

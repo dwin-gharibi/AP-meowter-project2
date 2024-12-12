@@ -27,6 +27,7 @@ public class User {
     private String password;
 
     @JsonIgnore
+    @Column(nullable = true)
     private String bio;
 
     @Column(nullable = false)
@@ -71,6 +72,7 @@ public class User {
         this.password = password;
         this.role = role;
         this.active = true;
+        this.isPrivate = false;
         this.bio = "";
     }
 

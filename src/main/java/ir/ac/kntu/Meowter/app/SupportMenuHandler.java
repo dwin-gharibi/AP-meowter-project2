@@ -45,34 +45,13 @@ public class SupportMenuHandler {
 
     private void viewAllReports() {
         System.out.println(CliFormatter.boldYellow("List of all reports:"));
-        supportService.getAllReports().forEach(report ->
-                System.out.println("Report ID: , Status: ")
-        );
     }
 
     private void respondToReport() {
         System.out.print("Enter the Report ID to respond to: ");
-        String reportId = scanner.nextLine();
-        System.out.print("Enter your response: ");
-        String response = scanner.nextLine();
-
-        boolean success = supportService.respondToReport(reportId, response);
-        if (success) {
-            System.out.println(CliFormatter.green("Response to report ID " + reportId + " has been submitted."));
-        } else {
-            System.out.println(CliFormatter.red("Failed to respond to the report. Ensure the Report ID is correct."));
-        }
     }
 
     private void assistUser() {
         System.out.print("Enter the username of the user to assist: ");
-        String username = scanner.nextLine();
-
-        boolean success = supportService.assistUser(username);
-        if (success) {
-            System.out.println(CliFormatter.green("Successfully assisted the user " + username + "."));
-        } else {
-            System.out.println(CliFormatter.red("Failed to assist user. Ensure the username is correct."));
-        }
     }
 }

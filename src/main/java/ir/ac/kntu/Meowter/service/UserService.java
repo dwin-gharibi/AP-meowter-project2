@@ -18,12 +18,12 @@ public class UserService {
         this.userRepository = new UserRepository();
     }
 
-    public void createUser(String username, String email, String password) {
+    public void createUser(String username, String email, String password, Role role) {
         ValidationUtil.validateUsername(username);
         ValidationUtil.validateEmail(email);
         ValidationUtil.validatePassword(password);
 
-        User user = new User(username, email, password, Role.USER);
+        User user = new User(username, email, password, role);
         userRepository.save(user);
     }
 

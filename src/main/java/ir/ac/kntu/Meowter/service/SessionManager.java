@@ -2,7 +2,8 @@ package ir.ac.kntu.Meowter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.ac.kntu.Meowter.model.User;
-
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.repository.UserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ public class SessionManager {
 
     private static final String SESSION_FILE = "userSession.json";
     private static String sessionChecksum = null;
+    private static UserRepository userRepository = new UserRepository();
 
     public static void saveSession(User user) {
         try {
@@ -33,15 +35,21 @@ public class SessionManager {
             if (sessionFile.exists() && sessionFile.length() > 0) {
                 String currentChecksum = computeChecksum(sessionFile);
                 if (sessionChecksum != null && !sessionChecksum.equals(currentChecksum)) {
-                    System.out.println("⚠️ Session file has been modified! Session will be terminated.");
+                    CliFormatter.loadingSpinner("⚠️ Session file has been modified! Session will be terminated.");
                     clearSession();
                     return null;
                 }
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.readValue(sessionFile, User.class);
+                User userFromSession = objectMapper.readValue(sessionFile, User.class);
+
+                User fullUser = userRepository.findByUsername(userFromSession.getUsername());
+
+
+                return fullUser;
+
             } else {
-                System.out.println("⚠️ Session file is empty or corrupted.");
+                CliFormatter.loadingSpinner("⚠️ Session file has been modified!");
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             System.out.println("Error loading session: " + e.getMessage());

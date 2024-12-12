@@ -1,10 +1,17 @@
 package ir.ac.kntu.Meowter.controller;
 
+import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.model.FollowRequestStatus;
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.PaginationUtil;
+import java.util.*;
+import ir.ac.kntu.Meowter.util.DateConverter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserController {
@@ -16,6 +23,90 @@ public class UserController {
         this.postService = new PostService();
         this.userService = new UserService();
     }
+
+    public void displayProfile(User LoggedInUser) {
+        CliFormatter.loadingSpinner("Getting user information and profile...");
+
+        StringBuilder profileDetails = new StringBuilder();
+
+        profileDetails.append("👤 **Username**: ").append(LoggedInUser.getUsername()).append("\n");
+        profileDetails.append("📧 **Email**: ").append(LoggedInUser.getEmail()).append("\n");
+        profileDetails.append("📝 **Bio**: ").append(LoggedInUser.getBio() == null ? "No bio provided." : LoggedInUser.getBio()).append("\n");
+        profileDetails.append("🎂 **Date of Birth**: ").append(LoggedInUser.getDateofbirth() != null ? LoggedInUser.getDateofbirth().toLocalDate().toString() : "Not provided").append("\n");
+
+        profileDetails.append("🔒 **Private Profile**: ").append(LoggedInUser.getIsPrivate() ? "Yes" : "No").append("\n");
+
+        profileDetails.append("👥 **Followers**: ").append(LoggedInUser.getFollowers().size()).append("\n");
+        profileDetails.append("👣 **Following**: ").append(LoggedInUser.getFollowing().size()).append("\n");
+
+//        if (LoggedInUser.posts != null && !LoggedInUser.posts.isEmpty()) {
+//            profileDetails.append("\n📸 **Posts**:\n");
+//            for (Post post : this.posts) {
+//                profileDetails.append("  - ").append(post.getContent()).append(" (👍 ").append(post.getLikes().size()).append(" Likes)\n");
+//            }
+//        } else {
+//            profileDetails.append("\n📸 **Posts**: No posts yet.\n");
+//        }
+
+        profileDetails.append("🛠️ **Role**: ").append(LoggedInUser.getRole()).append("\n");
+
+        profileDetails.append("✅ **Active**: ").append(LoggedInUser.isActive() ? "Yes" : "No").append("\n");
+
+        System.out.println(profileDetails.toString());
+
+
+        List<Post> posts = postService.getUserPosts(LoggedInUser);
+        if (posts.isEmpty()) {
+            System.out.println("You haven't created any posts yet.");
+        } else {
+            List<String> post_details = new ArrayList<>();
+            posts.forEach(post -> post_details.add("Post ID: " + post.getId() + " | Content: " + post.getContent()));
+            PaginationUtil.paginate(post_details);
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+
+        while (true) {
+            System.out.println("Profile edit for: " + LoggedInUser.getUsername());
+            System.out.println("1. Edit or add Biography");
+            System.out.println("2. Edit or add BirthDate");
+            System.out.println("3. Go Back");
+
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            try{
+                switch (choice) {
+                    case 1:
+                        System.out.print("Enter new Biography: ");
+                        String newBio = scanner.nextLine();
+                        LoggedInUser = userService.updateBio(LoggedInUser, newBio);
+                        System.out.println("Biography updated successfully.");
+                        break;
+
+                    case 2:
+                        System.out.print("Enter new BirthDate(YYYY-MM-DD) : ");
+                        String newDate = scanner.nextLine();
+                        LoggedInUser = userService.updateDateOfBirth(LoggedInUser, DateConverter.convertStringToDate(newDate));
+                        System.out.println("Birthdate updated successfully.");
+                        break;
+
+                    case 3:
+                        return;
+
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
+
 
     public void displayUsersSection(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);

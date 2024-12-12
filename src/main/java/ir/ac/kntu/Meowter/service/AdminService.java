@@ -8,7 +8,7 @@ import java.util.List;
 public class AdminService {
 
     public List<User> getAllUsers() {
-        return List.of(new User("admin1", "admin1@example.com", "password", Role.ADMIN));
+        return null;
     }
 
     public boolean banUser(String username) {

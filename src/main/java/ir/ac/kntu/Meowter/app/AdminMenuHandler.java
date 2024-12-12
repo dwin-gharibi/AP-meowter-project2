@@ -49,29 +49,17 @@ public class AdminMenuHandler {
 
     private void viewAllUsers() {
         System.out.println(CliFormatter.boldYellow("List of all users:"));
-        adminService.getAllUsers().forEach(user ->
-                System.out.println("Username: " + user.getUsername() + ", Role: " + user.getRole())
-        );
     }
 
     private void banUser() {
         System.out.print("Enter the username of the user to ban: ");
-        String username = scanner.nextLine();
-        boolean success = adminService.banUser(username);
-        if (success) {
-            System.out.println(CliFormatter.green("User " + username + " has been banned successfully."));
-        } else {
-            System.out.println(CliFormatter.red("Failed to ban user. Ensure the username is correct."));
-        }
     }
 
     private void managePosts() {
         System.out.println("Feature under development: Post management.");
-
     }
 
     private void viewReports() {
         System.out.println("Feature under development: Viewing reports.");
-
     }
 }

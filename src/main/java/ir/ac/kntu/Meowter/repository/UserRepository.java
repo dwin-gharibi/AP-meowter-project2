@@ -5,6 +5,7 @@ import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.util.HibernateUtil;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -72,6 +73,25 @@ public class UserRepository {
         try {
             user = session.createQuery("FROM User WHERE username = :username", User.class)
                     .setParameter("username", username)
+                    .uniqueResult();
+
+            if (user != null) {
+                Hibernate.initialize(user.getFollowers());
+                Hibernate.initialize(user.getFollowing());
+            }
+
+        } finally {
+            session.close();
+        }
+        return user;
+    }
+
+    public User findById(Long id) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        User user = null;
+        try {
+            user = session.createQuery("FROM User WHERE id = :id", User.class)
+                    .setParameter("id", id)
                     .uniqueResult();
         } finally {
             session.close();

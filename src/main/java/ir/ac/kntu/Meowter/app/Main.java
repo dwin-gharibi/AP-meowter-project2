@@ -19,26 +19,30 @@ public class Main {
 
 //        CliFormatter.progressBar("this is a sample text", 100);
 
-        List<String> data = Arrays.asList("apple", "apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple", "banana", "grape", "pineapple", "blueberry");
-        List<String> results = SearchUtil.search("app", data);
-        PaginationUtil.paginate(results);
-        List<String> items = IntStream.range(1, 101).mapToObj(String::valueOf).collect(Collectors.toList());
-        PaginationUtil.paginate(items);
-
-        List<String> headers = Arrays.asList("ID", "Name", "Role");
-        List<List<String>> data2 = Arrays.asList(
-                Arrays.asList("1", "Alice", "Admin"),
-                Arrays.asList("2", "Bob", "Support"),
-                Arrays.asList("3", "Charlie", "User")
-        );
-
-        String reportPath = HtmlReportGeneratorUtil.generateReport("User Report", headers, data2);
-        System.out.println("Report generated: " + reportPath);
+//        List<String> data = Arrays.asList("apple", "apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple","apple", "banana", "grape", "pineapple", "blueberry");
+//        List<String> results = SearchUtil.search("app", data);
+//        PaginationUtil.paginate(results);
+//        List<String> items = IntStream.range(1, 101).mapToObj(String::valueOf).collect(Collectors.toList());
+//        PaginationUtil.paginate(items);
+//
+//        List<String> headers = Arrays.asList("ID", "Name", "Role");
+//        List<List<String>> data2 = Arrays.asList(
+//                Arrays.asList("1", "Alice", "Admin"),
+//                Arrays.asList("2", "Bob", "Support"),
+//                Arrays.asList("3", "Charlie", "User")
+//        );
+//
+//        String reportPath = HtmlReportGeneratorUtil.generateReport("User Report", headers, data2);
+//        System.out.println("Report generated: " + reportPath);
 
 
         CliFormatter.printMeow();
         Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();
+
+//        userService.createUser("admin", "admin@admin.com", "Admin@123", Role.ADMIN);
+//        userService.createUser("support", "support@support.com", "Support@123", Role.SUPPORT);
+
 
         User loggedInUser = SessionManager.loadSession();
         Role role = null;
@@ -51,17 +55,17 @@ public class Main {
         while (true) {
             if (loggedInUser == null) {
                 System.out.println(CliFormatter.boldGreen("Welcome to Meowter!"));
-                System.out.println("1. 👤 User");
-                System.out.println("2. ⚙️ Admin");
-                System.out.println("3. 🛠️ Support User");
-                System.out.println("4. Exit");
-                System.out.print("Choose your role (1, 2, 3 or 4 to exit): ");
+                System.out.println(CliFormatter.blue("1. 👤 User"));
+                System.out.println(CliFormatter.green("2. ⚙️ Admin"));
+                System.out.println(CliFormatter.yellow("3. 🛠️ Support User"));
+                System.out.println(CliFormatter.boldRed("4. Exit"));
+                System.out.print(CliFormatter.bold("Choose your role (1, 2, 3 or 4 to exit): "));
 
                 int roleChoice = scanner.nextInt();
                 scanner.nextLine();
 
                 if (roleChoice == 4) {
-                    System.out.println("Goodbye!");
+                    System.out.println(CliFormatter.boldRed("Goodbye!"));
                     break;
                 }
 

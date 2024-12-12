@@ -77,7 +77,7 @@ public class MenuHandler {
                         postController.displayPostsSection(loggedInUser);
                         break;
                     case 5:
-                        displayUserProfile(loggedInUser);
+                        userController.displayProfile(loggedInUser);
                         break;
                     case 6:
                         loggedInUser = null;
@@ -152,7 +152,4 @@ public class MenuHandler {
         System.out.println("Posts Section");
     }
 
-    private void displayUserProfile(User loggedInUser) {
-        System.out.println("User Profile: " + loggedInUser.getUsername());
-    }
 }

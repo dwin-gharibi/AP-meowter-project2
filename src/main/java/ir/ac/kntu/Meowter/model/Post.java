@@ -1,8 +1,8 @@
 package ir.ac.kntu.Meowter.model;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "posts")
@@ -22,12 +22,33 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Like> likes;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date createdAt;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "post_hashtags", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "hashtag")
+    private Set<String> hashtags = new HashSet<>();
+
+    public Set<String> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(Set<String> hashtags) {
+        this.hashtags = hashtags;
+    }
+
+    public void extractHashtags() {
+        this.hashtags = Arrays.stream(content.split("\\s+"))
+                .filter(word -> word.startsWith("#"))
+                .map(word -> word.replaceAll("[^a-zA-Z0-9_#]", ""))
+                .collect(Collectors.toSet());
+    }
+
 
     public Post() {}
 

@@ -7,6 +7,7 @@ import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.controller.AdminController;
 import ir.ac.kntu.Meowter.controller.UserController;
+import ir.ac.kntu.Meowter.controller.PostController;
 import ir.ac.kntu.Meowter.controller.SupportController;
 import ir.ac.kntu.Meowter.controller.TicketController;
 import ir.ac.kntu.Meowter.util.CliFormatter;
@@ -18,11 +19,13 @@ public class MenuHandler {
     private UserService userService;
     private TicketController ticketController;
     private UserController userController;
+    private PostController postController;
 
     public MenuHandler() {
         this.userService = new UserService();
         this.ticketController = new TicketController();
         this.userController = new UserController();
+        this.postController = new PostController();
     }
 
     public void displayMainMenu(User loggedInUser, Role role) {
@@ -71,7 +74,7 @@ public class MenuHandler {
                         userController.displayUsersSection(loggedInUser);
                         break;
                     case 4:
-                        displayPostsSection(loggedInUser);
+                        postController.displayPostsSection(loggedInUser);
                         break;
                     case 5:
                         displayUserProfile(loggedInUser);

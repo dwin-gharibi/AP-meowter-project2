@@ -53,37 +53,33 @@ public class PostService {
         }
     }
 
-    public void editPost(User user, long postId, String newContent) {
+    public boolean editPost(User user, long postId, String newContent) {
         Post post = postRepository.findById(postId);
         if (post == null) {
-            System.out.println("Post not found.");
-            return;
+            return false;
         }
 
         if (!post.getUser().equals(user)) {
-            System.out.println("You can only edit your own posts.");
-            return;
+            return false;
         }
 
         post.setContent(newContent);
         postRepository.update(post);
-        System.out.println("Post updated successfully.");
+        return true;
     }
 
-    public void deletePost(User user, long postId) {
+    public boolean deletePost(User user, long postId) {
         Post post = postRepository.findById(postId);
         if (post == null) {
-            System.out.println("Post not found.");
-            return;
+            return false;
         }
 
         if (!post.getUser().equals(user)) {
-            System.out.println("You can only delete your own posts.");
-            return;
+            return false;
         }
 
         postRepository.delete(postId);
-        System.out.println("Post deleted successfully.");
+        return true;
     }
 
     public void viewPostDetails(long postId) {
@@ -101,20 +97,18 @@ public class PostService {
         });
     }
 
-    public void addLike(User user, long postId) {
+    public boolean addLike(User user, long postId) {
         Post post = postRepository.findById(postId);
         if (post == null) {
-            System.out.println("Post not found.");
-            return;
+            return false;
         }
 
         if (post.getLikes().stream().anyMatch(like -> like.getUser().equals(user))) {
-            System.out.println("You have already liked this post.");
-            return;
+            return false;
         }
 
         postRepository.addLike(user, post);
-        System.out.println("Post liked successfully.");
+        return true;
     }
 
     public List<Post> getUserPosts(User user) {
@@ -185,14 +179,9 @@ public class PostService {
         }
     }
 
-    public void addComment(User user, Post post, String content) {
-
+    public List<Post> searchPostsByHashtag(String hashtag) {
+        return postRepository.findByHashtag(hashtag);
     }
-
-    public void removeComment(User user, Post post, long commentId) {
-
-    }
-
 
 
     public void removeLike(User user, long postId) {
@@ -211,15 +200,14 @@ public class PostService {
         System.out.println("Like removed successfully.");
     }
 
-    public void addComment(User user, long postId, String content) {
+    public boolean addComment(User user, long postId, String content) {
         Post post = postRepository.findById(postId);
         if (post == null) {
-            System.out.println("Post not found.");
-            return;
+            return false;
         }
 
         postRepository.addComment(user, post, content);
-        System.out.println("Comment added successfully.");
+        return true;
     }
 
     public void removeComment(User user, long postId, long commentId) {

@@ -16,6 +16,7 @@ public class PostRepository {
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
+            post.extractHashtags();
             session.save(post);
             transaction.commit();
         } catch (Exception e) {
@@ -57,6 +58,21 @@ public class PostRepository {
         } finally {
             session.close();
         }
+    }
+
+    public List<Post> findByHashtag(String hashtag) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Post> posts = null;
+
+        try {
+            String hql = "SELECT p FROM Post p JOIN p.hashtags h WHERE h = :hashtag";
+            posts = session.createQuery(hql, Post.class)
+                    .setParameter("hashtag", hashtag)
+                    .getResultList();
+        } finally {
+            session.close();
+        }
+        return posts;
     }
 
     public Post findById(Long postId) {

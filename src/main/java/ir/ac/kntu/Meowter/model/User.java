@@ -36,6 +36,7 @@ public class User {
     @JsonIgnore
     private List<Post> posts;
 
+    @JsonIgnore
     private LocalDateTime dateofbirth;
 
     @ManyToMany
@@ -70,6 +71,7 @@ public class User {
         this.password = password;
         this.role = role;
         this.active = true;
+        this.bio = "";
     }
 
     public boolean getIsPrivate() {

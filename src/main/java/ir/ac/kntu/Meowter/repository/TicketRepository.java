@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.repository;
 
+import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.Ticket;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -51,6 +52,21 @@ public class TicketRepository {
             session.close();
         }
         return ticket;
+    }
+
+    public List<Ticket> findAll() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Ticket> tickets = null;
+
+        try {
+            tickets = session.createQuery("FROM Ticket ", Ticket.class).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return tickets;
     }
 
     public void update(Ticket ticket) {

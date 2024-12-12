@@ -7,8 +7,12 @@ import ir.ac.kntu.Meowter.model.Ticket;
 import ir.ac.kntu.Meowter.model.TicketSubject;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.PaginationUtil;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class TicketController {
@@ -27,7 +31,12 @@ public class TicketController {
         while (true) {
             System.out.println("Ticket Section");
             System.out.println("1. Create Ticket");
-            System.out.println("2. View My Tickets");
+            if (loggedInUser.getRole() == Role.SUPPORT){
+                System.out.println("2. View All Tickets");
+            } else{
+                System.out.println("2. View My Tickets");
+            }
+
             if (loggedInUser.getRole() == Role.SUPPORT){
                 System.out.println("3. Respond to Ticket");
                 System.out.println("4. Close Ticket");
@@ -56,12 +65,51 @@ public class TicketController {
                     break;
                 case 2:
                     System.out.println("Your Tickets:");
-                    ticketService.getUserTickets(loggedInUser.getUsername()).forEach(t -> {
-                        System.out.println("Ticket ID: " + t.getId() + " | Status: " + t.getStatus());
-                        if (!t.getResponse().isEmpty()) {
-                            System.out.println("Response: " + t.getResponse());
-                        }
-                    });
+                    CliFormatter.loadingSpinner("Waiting for tickets ...");
+                    List<String> ticket_details = new ArrayList<>();
+
+                    if (loggedInUser.getRole() == Role.SUPPORT) {
+                        ticketService.getAllTickets().forEach(t -> {
+                            String response = t.getResponse() == null
+                                    ? CliFormatter.red("No Response Available")
+                                    : CliFormatter.boldGreen(t.getResponse());
+                            String ticketId = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                            String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
+                            String warning = t.getIsWarned()
+                                    ? CliFormatter.boldRed("Yes")
+                                    : CliFormatter.green("No");
+
+                            ticket_details.add("Ticket ID: " + ticketId +
+                                    " | Status: " + status +
+                                    "\nResponse: " + response +
+                                    "\nWarning: " + warning);
+                        });
+
+                        PaginationUtil.paginate(ticket_details);
+                    } else {
+                        ticketService.getUserTickets(loggedInUser.getUsername()).forEach(t -> {
+                            String response = t.getResponse() == null
+                                    ? CliFormatter.red("No Response Available")
+                                    : CliFormatter.boldGreen(t.getResponse());
+                            String ticketId = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                            String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
+                            String warning = t.getIsWarned()
+                                    ? CliFormatter.boldRed("Yes")
+                                    : CliFormatter.green("No");
+
+                            ticket_details.add("Ticket ID: " + ticketId +
+                                    " | Status: " + status +
+                                    "\nResponse: " + response +
+                                    "\nWarning: " + warning);
+                        });
+
+                        PaginationUtil.paginate(ticket_details);
+                    }
+
+
+
+
+
                     break;
                 case 3:
                     System.out.print("Enter Ticket ID to respond: ");

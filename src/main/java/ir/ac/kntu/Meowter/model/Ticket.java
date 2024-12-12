@@ -13,6 +13,8 @@ public class Ticket {
 
     private String description;
 
+    private boolean isWarned;
+
     @Enumerated(EnumType.STRING)
     private TicketSubject subject;
 
@@ -36,6 +38,15 @@ public class Ticket {
         this.status = TicketStatus.SUBMITTED;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.isWarned = false;
+    }
+
+    public boolean getIsWarned(){
+        return this.isWarned;
+    }
+
+    public void setIsWarned(boolean isWarned){
+        this.isWarned = isWarned;
     }
 
     public Long getId() {

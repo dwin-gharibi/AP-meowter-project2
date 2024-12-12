@@ -179,6 +179,10 @@ public class PostService {
         }
     }
 
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
     public List<Post> searchPostsByHashtag(String hashtag) {
         return postRepository.findByHashtag(hashtag);
     }

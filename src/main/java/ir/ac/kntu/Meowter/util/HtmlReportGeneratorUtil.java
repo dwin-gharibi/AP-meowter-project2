@@ -64,6 +64,6 @@ public class HtmlReportGeneratorUtil {
             System.out.println("Error generating report: " + e.getMessage());
         }
 
-        return Paths.get(fileName).toAbsolutePath().toString();
+        return "file:/" + Paths.get(fileName).toAbsolutePath().toString();
     }
 }

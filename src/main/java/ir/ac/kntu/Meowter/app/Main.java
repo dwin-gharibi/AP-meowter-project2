@@ -53,6 +53,7 @@ public class Main {
         }
 
         while (true) {
+
             if (loggedInUser == null) {
                 System.out.println(CliFormatter.boldGreen("Welcome to Meowter!"));
                 System.out.println(CliFormatter.blue("1. 👤 User"));
@@ -145,6 +146,15 @@ public class Main {
                 }
 
             } else {
+
+                if(!loggedInUser.isActive()){
+                    System.out.println(CliFormatter.boldRed("Your account is Inactive!"));
+                    System.out.println(CliFormatter.yellow("For getting more information contact with admin."));
+                    System.out.println("Logging out...");
+                    SessionManager.clearSession();
+                    loggedInUser = null;
+                }
+
                 if (role == Role.ADMIN) {
                     AdminMenuHandler adminMenuHandler = new AdminMenuHandler();
                     adminMenuHandler.displayAdminMenu(loggedInUser);
@@ -164,6 +174,7 @@ public class Main {
                     loggedInUser = null;
                 }
             }
+
         }
     }
 

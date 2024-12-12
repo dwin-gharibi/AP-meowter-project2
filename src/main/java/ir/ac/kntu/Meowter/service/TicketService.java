@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.service;
 
+import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.Ticket;
 import ir.ac.kntu.Meowter.model.TicketStatus;
 import ir.ac.kntu.Meowter.model.TicketSubject;
@@ -13,6 +14,10 @@ public class TicketService {
 
     public TicketService() {
         this.ticketRepository = new TicketRepository();
+    }
+
+    public List<Ticket> getAllTickets() {
+        return ticketRepository.findAll();
     }
 
     public Ticket createTicket(String description, TicketSubject subject, String username) {

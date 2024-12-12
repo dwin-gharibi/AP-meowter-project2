@@ -130,7 +130,8 @@ public class Main {
                         }
 
                         if (loggedInUser != null) {
-                            System.out.println("Registration successful! Please log in.");
+                            System.out.println(CliFormatter.boldGreen("Registration successful! You are now logged in."));
+                            SessionManager.saveSession(loggedInUser);
                             continue;
                         }
                     } else {

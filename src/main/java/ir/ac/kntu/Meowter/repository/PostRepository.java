@@ -1,7 +1,9 @@
 package ir.ac.kntu.Meowter.repository;
 
+import ir.ac.kntu.Meowter.model.Like;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.model.Comment;
 import ir.ac.kntu.Meowter.util.HibernateUtil;
 
 import org.hibernate.Session;
@@ -135,16 +137,94 @@ public class PostRepository {
     }
 
     public void addLike(User user, Post post) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            if (post.getLikes().stream().anyMatch(like -> like.getUser().equals(user))) {
+                System.out.println("User already liked this post.");
+                return;
+            }
+            Like like = new Like(user, post);
+            session.save(like);
+            post.addLike(like); // Update the relationship
+            session.update(post); // Persist changes to the post
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public void addComment(User user, Post post, String content) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            Comment comment = new Comment(content, post, user);
+            session.save(comment);
+            post.addComment(comment); // Update the relationship
+            session.update(post); // Persist changes to the post
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public void removeComment(User user, Post post, long commentId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            Comment comment = session.get(Comment.class, commentId);
+            if (comment != null && comment.getUser().equals(user) && comment.getPost().equals(post)) {
+                post.removeComment(comment); // Update the relationship
+                session.delete(comment);
+                session.update(post); // Persist changes to the post
+                transaction.commit();
+            } else {
+                System.out.println("Comment not found or user is not authorized to delete.");
+            }
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public void removeLike(User user, Post post) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
 
+        try {
+            transaction = session.beginTransaction();
+            Like like = post.getLikes().stream()
+                    .filter(l -> l.getUser().equals(user))
+                    .findFirst()
+                    .orElse(null);
+            if (like != null) {
+                post.removeLike(like); // Update the relationship
+                session.delete(like);
+                session.update(post); // Persist changes to the post
+                transaction.commit();
+            } else {
+                System.out.println("Like not found.");
+            }
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 }
 

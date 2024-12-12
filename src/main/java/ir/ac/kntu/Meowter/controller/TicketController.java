@@ -6,7 +6,7 @@ import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.model.Ticket;
 import ir.ac.kntu.Meowter.model.TicketSubject;
 import ir.ac.kntu.Meowter.model.User;
-import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.PaginationUtil;
 
@@ -19,10 +19,12 @@ public class TicketController {
 
     private TicketService ticketService;
     private final TicketRepository ticketRepository;
+    private UserService userService;
 
     public TicketController() {
         this.ticketService = new TicketService();
         this.ticketRepository = new TicketRepository();
+        this.userService = new UserService();
     }
 
     public void displayTicketSection(User loggedInUser) {
@@ -30,7 +32,15 @@ public class TicketController {
 
         while (true) {
             System.out.println("Ticket Section");
-            System.out.println("1. Create Ticket");
+
+
+            if (loggedInUser.getRole() == Role.SUPPORT){
+                System.out.println("0. Ban a Ticket User");
+                System.out.println("1. Set Warning on Ticket");
+            } else{
+                System.out.println("1. Create Ticket");
+            }
+
             if (loggedInUser.getRole() == Role.SUPPORT){
                 System.out.println("2. View All Tickets");
             } else{
@@ -40,6 +50,7 @@ public class TicketController {
             if (loggedInUser.getRole() == Role.SUPPORT){
                 System.out.println("3. Respond to Ticket");
                 System.out.println("4. Close Ticket");
+
             }
             System.out.println("5. Back to User Menu");
             System.out.print("Choose an option: ");
@@ -47,6 +58,19 @@ public class TicketController {
             scanner.nextLine();
 
             switch (choice) {
+                case 0:
+                    System.out.print("Enter Ticket ID to ban Ticket User: ");
+                    long ticketIdBan = scanner.nextLong();
+                    scanner.nextLine();
+                    Ticket ticketToBan = ticketRepository.findById(ticketIdBan);
+                    if (ticketToBan != null) {
+                        User user = userService.searchUserByUsername(ticketToBan.getUsername());
+                        user.setActive(false);
+                        System.out.println(CliFormatter.boldRed("User of this ticket get InActivated!"));
+                    } else {
+                        System.out.println("Ticket not found or invalid.");
+                    }
+                    break;
                 case 1:
                     System.out.print("Enter ticket description: ");
                     String description = scanner.nextLine();
@@ -73,13 +97,13 @@ public class TicketController {
                             String response = t.getResponse() == null
                                     ? CliFormatter.red("No Response Available")
                                     : CliFormatter.boldGreen(t.getResponse());
-                            String ticketId = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                            String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
                             String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
                             String warning = t.getIsWarned()
                                     ? CliFormatter.boldRed("Yes")
                                     : CliFormatter.green("No");
 
-                            ticket_details.add("Ticket ID: " + ticketId +
+                            ticket_details.add("Ticket ID: " + ticketIdOut +
                                     " | Status: " + status +
                                     "\nResponse: " + response +
                                     "\nWarning: " + warning);
@@ -91,13 +115,13 @@ public class TicketController {
                             String response = t.getResponse() == null
                                     ? CliFormatter.red("No Response Available")
                                     : CliFormatter.boldGreen(t.getResponse());
-                            String ticketId = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                            String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
                             String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
                             String warning = t.getIsWarned()
                                     ? CliFormatter.boldRed("Yes")
                                     : CliFormatter.green("No");
 
-                            ticket_details.add("Ticket ID: " + ticketId +
+                            ticket_details.add("Ticket ID: " + ticketIdOut +
                                     " | Status: " + status +
                                     "\nResponse: " + response +
                                     "\nWarning: " + warning);
@@ -105,22 +129,19 @@ public class TicketController {
 
                         PaginationUtil.paginate(ticket_details);
                     }
-
-
-
-
-
                     break;
                 case 3:
                     System.out.print("Enter Ticket ID to respond: ");
                     long ticketId = scanner.nextLong();
                     scanner.nextLine();
                     Ticket ticketToRespond = ticketRepository.findById(ticketId);
-                    if (ticketToRespond != null && ticketToRespond.getUsername().equals(loggedInUser.getUsername())) {
-                        System.out.print("Enter response: ");
-                        String response = scanner.nextLine();
-                        ticketService.respondToTicket(ticketToRespond, response);
-                        System.out.println("Response added successfully.");
+                    if (ticketToRespond != null) {
+                        if (ticketToRespond.getUsername().equals(loggedInUser.getUsername()) || loggedInUser.getRole() == Role.SUPPORT) {
+                            System.out.print("Enter response: ");
+                            String response = scanner.nextLine();
+                            ticketService.respondToTicket(ticketToRespond, response);
+                            System.out.println("Response added successfully.");
+                        }
                     } else {
                         System.out.println("Ticket not found or invalid.");
                     }

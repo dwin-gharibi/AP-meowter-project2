@@ -4,25 +4,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SessionManager {
 
     private static final String SESSION_FILE = "userSession.json";
-    private static String sessionChecksum = null;
     private static UserRepository userRepository = new UserRepository();
 
     public static void saveSession(User user) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             File sessionFile = new File(SESSION_FILE);
-            objectMapper.writeValue(sessionFile, user);
 
-            sessionChecksum = computeChecksum(sessionFile);
+            String checksum = computeChecksum(user);
+            SessionData sessionData = new SessionData(user, checksum);
+
+            objectMapper.writeValue(sessionFile, sessionData);
+
             System.out.println("Session saved successfully.");
         } catch (IOException | NoSuchAlgorithmException e) {
             System.out.println("Error saving session: " + e.getMessage());
@@ -33,23 +35,20 @@ public class SessionManager {
         try {
             File sessionFile = new File(SESSION_FILE);
             if (sessionFile.exists() && sessionFile.length() > 0) {
-                String currentChecksum = computeChecksum(sessionFile);
-                if (sessionChecksum != null && !sessionChecksum.equals(currentChecksum)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                SessionData sessionData = objectMapper.readValue(sessionFile, SessionData.class);
+
+                String currentChecksum = computeChecksum(sessionData.getUser());
+
+                if (!sessionData.getChecksum().equals(currentChecksum)) {
                     CliFormatter.loadingSpinner("⚠️ Session file has been modified! Session will be terminated.");
                     clearSession();
                     return null;
                 }
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                User userFromSession = objectMapper.readValue(sessionFile, User.class);
-
-                User fullUser = userRepository.findByUsername(userFromSession.getUsername());
-
-
-                return fullUser;
-
+                return sessionData.getUser();
             } else {
-                CliFormatter.loadingSpinner("⚠️ Session file has been modified!");
+                CliFormatter.loadingSpinner("⚠️ No valid session file found!");
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             System.out.println("Error loading session: " + e.getMessage());
@@ -61,20 +60,49 @@ public class SessionManager {
         File sessionFile = new File(SESSION_FILE);
         if (sessionFile.exists()) {
             sessionFile.delete();
-            sessionChecksum = null;
             System.out.println("Session cleared.");
         }
     }
 
-    private static String computeChecksum(File file) throws NoSuchAlgorithmException, IOException {
+    private static String computeChecksum(User user) throws NoSuchAlgorithmException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] userBytes = objectMapper.writeValueAsBytes(user);
+
         MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] fileBytes = Files.readAllBytes(file.toPath());
-        byte[] checksumBytes = md.digest(fileBytes);
+        byte[] checksumBytes = md.digest(userBytes);
 
         StringBuilder sb = new StringBuilder();
         for (byte b : checksumBytes) {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    public static class SessionData {
+        private User user;
+        private String checksum;
+
+        public SessionData() {}
+
+        public SessionData(User user, String checksum) {
+            this.user = user;
+            this.checksum = checksum;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
+
+        public String getChecksum() {
+            return checksum;
+        }
+
+        public void setChecksum(String checksum) {
+            this.checksum = checksum;
+        }
     }
 }

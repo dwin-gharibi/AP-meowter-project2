@@ -4,14 +4,13 @@ import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.PostRepository;
 import ir.ac.kntu.Meowter.repository.UserRepository;
-import ir.ac.kntu.Meowter.util.CliFormatter;
-import ir.ac.kntu.Meowter.util.BlacklistUtil;
-import ir.ac.kntu.Meowter.util.ContentModerationUtil;
-import ir.ac.kntu.Meowter.util.RedisUtil;
+import ir.ac.kntu.Meowter.util.*;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.List;
 import java.util.Scanner;
+
+import static ir.ac.kntu.Meowter.util.GrammarAndPunctuationUtil.checkGrammarAndPunctuation;
 
 public class PostService {
 
@@ -154,6 +153,13 @@ public class PostService {
             CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
             return;
         }
+
+//        String textWithErrors = "this is a example of text with wrong grammer, punctuations are also wrong";
+//        String correctedText = checkGrammarAndPunctuation(textWithErrors);
+//        System.out.println("Corrected Text: " + correctedText);
+
+//        String description = PostDescriptionUtil.describePost(content);
+//        System.out.println("Post Description: " + description);
 
         redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
 

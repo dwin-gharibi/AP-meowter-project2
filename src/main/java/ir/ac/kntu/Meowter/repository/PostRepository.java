@@ -148,8 +148,8 @@ public class PostRepository {
             }
             Like like = new Like(user, post);
             session.save(like);
-            post.addLike(like); // Update the relationship
-            session.update(post); // Persist changes to the post
+            post.addLike(like);
+            session.update(post);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -167,8 +167,8 @@ public class PostRepository {
             transaction = session.beginTransaction();
             Comment comment = new Comment(content, post, user);
             session.save(comment);
-            post.addComment(comment); // Update the relationship
-            session.update(post); // Persist changes to the post
+            post.addComment(comment);
+            session.update(post);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -186,9 +186,9 @@ public class PostRepository {
             transaction = session.beginTransaction();
             Comment comment = session.get(Comment.class, commentId);
             if (comment != null && comment.getUser().equals(user) && comment.getPost().equals(post)) {
-                post.removeComment(comment); // Update the relationship
+                post.removeComment(comment);
                 session.delete(comment);
-                session.update(post); // Persist changes to the post
+                session.update(post);
                 transaction.commit();
             } else {
                 System.out.println("Comment not found or user is not authorized to delete.");
@@ -212,9 +212,9 @@ public class PostRepository {
                     .findFirst()
                     .orElse(null);
             if (like != null) {
-                post.removeLike(like); // Update the relationship
+                post.removeLike(like);
                 session.delete(like);
-                session.update(post); // Persist changes to the post
+                session.update(post);
                 transaction.commit();
             } else {
                 System.out.println("Like not found.");

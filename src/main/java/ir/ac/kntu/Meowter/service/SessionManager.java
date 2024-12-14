@@ -24,10 +24,10 @@ public class SessionManager {
             SessionData sessionData = new SessionData(user, checksum);
 
             objectMapper.writeValue(sessionFile, sessionData);
-
-            System.out.println("Session saved successfully.");
+            CliFormatter.progressBar(CliFormatter.boldYellow("Saving the session..."), 10);
+            CliFormatter.printTypingEffect(CliFormatter.boldGreen("Session saved successfully."));
         } catch (IOException | NoSuchAlgorithmException e) {
-            System.out.println("Error saving session: " + e.getMessage());
+            System.out.println(CliFormatter.boldRed("Error saving session: " + e.getMessage()));
         }
     }
 
@@ -48,10 +48,10 @@ public class SessionManager {
 
                 return sessionData.getUser();
             } else {
-                CliFormatter.loadingSpinner("⚠️ No valid session file found!");
+                CliFormatter.loadingSpinner(CliFormatter.boldRed("⚠️ No valid session file found!"));
             }
         } catch (IOException | NoSuchAlgorithmException e) {
-            System.out.println("Error loading session: " + e.getMessage());
+            System.out.println(CliFormatter.boldRed("Error loading session: " + e.getMessage()));
         }
         return null;
     }
@@ -60,7 +60,7 @@ public class SessionManager {
         File sessionFile = new File(SESSION_FILE);
         if (sessionFile.exists()) {
             sessionFile.delete();
-            System.out.println("Session cleared.");
+            System.out.println(CliFormatter.boldBlue("Session cleared."));
         }
     }
 

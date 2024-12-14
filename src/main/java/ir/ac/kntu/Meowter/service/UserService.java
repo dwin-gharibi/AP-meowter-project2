@@ -39,6 +39,7 @@ public class UserService {
 
     public User updatePassword(User user, String newPassword) {
         ValidationUtil.validatePassword(newPassword);
+
         user.setPassword(newPassword);
         userRepository.update(user);
         SessionManager.saveSession(user);

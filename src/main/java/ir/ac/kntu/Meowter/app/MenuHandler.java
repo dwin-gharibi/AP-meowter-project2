@@ -109,13 +109,13 @@ public class MenuHandler {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Settings for: " + loggedInUser.getUsername());
-            System.out.println("1. Change Username (" + loggedInUser.getUsername() + ")");
-            System.out.println("2. Change Password (" + loggedInUser.getPassword() + ")");
-            System.out.println("3. Change Privacy Setting (" + loggedInUser.getIsPrivate() + ")");
-            System.out.println("4. Go Back");
+            System.out.println("Settings for: " + CliFormatter.boldGreen(loggedInUser.getUsername()));
+            System.out.println("1. Change Username (" + CliFormatter.boldBlue(loggedInUser.getUsername()) + ")");
+            System.out.println("2. Change Password (" + CliFormatter.boldYellow(loggedInUser.getPassword()) + ")");
+            System.out.println("3. Change Privacy Setting (" + (loggedInUser.getIsPrivate() ? CliFormatter.boldGreen("Yes") : CliFormatter.boldRed("No") )+ ")");
+            System.out.println(CliFormatter.boldRed("4. Go Back"));
 
-            System.out.print("Choose an option: ");
+            System.out.print(CliFormatter.green("Choose an option: "));
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -124,14 +124,14 @@ public class MenuHandler {
                     System.out.print("Enter new username: ");
                     String newUsername = scanner.nextLine();
                     loggedInUser = userService.updateUsername(loggedInUser, newUsername);
-                    System.out.println("Username updated successfully.");
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Username updated successfully."));
                     break;
 
                 case 2:
                     System.out.print("Enter new password: ");
                     String newPassword = scanner.nextLine();
                     loggedInUser = userService.updatePassword(loggedInUser, newPassword);
-                    System.out.println("Password updated successfully.");
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Password updated successfully."));
                     break;
 
                 case 3:
@@ -139,25 +139,16 @@ public class MenuHandler {
                     boolean isPrivate = scanner.nextBoolean();
                     scanner.nextLine();
                     loggedInUser = userService.updatePrivacySetting(loggedInUser, isPrivate);
-                    System.out.println("Privacy setting updated successfully.");
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Privacy setting updated successfully."));
                     break;
 
                 case 4:
                     return;
 
                 default:
-                    System.out.println("Invalid option. Please try again.");
+                    System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
             }
         }
-    }
-
-
-    private void displaySupportSection(User loggedInUser) {
-        System.out.println("Support Section");
-    }
-
-    private void displayPostsSection(User loggedInUser) {
-        System.out.println("Posts Section");
     }
 
 }

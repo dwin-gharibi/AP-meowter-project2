@@ -1,5 +1,6 @@
 package ir.ac.kntu.Meowter.controller;
 
+import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
@@ -31,17 +32,17 @@ public class UserController {
 
         profileDetails.append(CliFormatter.bold("👤 Username: ")).append(LoggedInUser.getUsername()).append("\n");
         profileDetails.append(CliFormatter.bold("📧 Email: ")).append(LoggedInUser.getEmail()).append("\n");
-        profileDetails.append(CliFormatter.bold("📝 Bio: ")).append(LoggedInUser.getBio() == null ? "No bio provided." : LoggedInUser.getBio()).append("\n");
-        profileDetails.append(CliFormatter.bold("🎂 Date of Birth: ")).append(LoggedInUser.getDateofbirth() != null ? LoggedInUser.getDateofbirth().toLocalDate().toString() : "Not provided").append("\n");
+        profileDetails.append(CliFormatter.bold("📝 Bio: ")).append(LoggedInUser.getBio() == null ? CliFormatter.boldRed("No bio provided.") : LoggedInUser.getBio()).append("\n");
+        profileDetails.append(CliFormatter.bold("🎂 Date of Birth: ")).append(LoggedInUser.getDateofbirth() != null ? LoggedInUser.getDateofbirth().toLocalDate().toString() : CliFormatter.boldRed("Not provided")).append("\n");
 
-        profileDetails.append(CliFormatter.bold("🔒 Private Profile: ")).append(LoggedInUser.getIsPrivate() ? "Yes" : "No").append("\n");
+        profileDetails.append(CliFormatter.bold("🔒 Private Profile: ")).append(LoggedInUser.getIsPrivate() ? CliFormatter.boldGreen("Yes") : CliFormatter.boldRed("No")).append("\n");
 
         profileDetails.append(CliFormatter.bold("👥 Followers: ")).append(LoggedInUser.getFollowers().size()).append("\n");
         profileDetails.append(CliFormatter.bold("👣 Following: ")).append(LoggedInUser.getFollowing().size()).append("\n");
 
         profileDetails.append(CliFormatter.bold("🛠️ Role: ")).append(LoggedInUser.getRole()).append("\n");
 
-        profileDetails.append(CliFormatter.bold("✅ Active: ")).append(LoggedInUser.isActive() ? "Yes" : "No").append("\n");
+        profileDetails.append(CliFormatter.bold("✅ Active: ")).append(LoggedInUser.isActive() ? CliFormatter.boldGreen("Yes") : CliFormatter.boldRed("No")).append("\n");
 
         System.out.println(profileDetails.toString());
 
@@ -52,9 +53,9 @@ public class UserController {
             List<String> post_details = new ArrayList<>();
 
             posts.forEach(post -> {
-                String postDetail = "Post ID: " + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
-                        "Content: " + CliFormatter.bold(post.getContent()) + "\n" +
-                        "Created At: " + CliFormatter.green(post.getCreatedAt().toString()) + "\n" +
+                String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
+                        "Content: " + CliFormatter.boldGreen(post.getContent()) + "\n" +
+                        "Created At: " + CliFormatter.boldBlue(post.getCreatedAt().toString()) + "\n" +
                         "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" +
                         "Hashtags: " + (post.getHashtags().isEmpty()
                         ? CliFormatter.red("No hashtags")
@@ -87,10 +88,11 @@ public class UserController {
 
 
         while (true) {
-            System.out.println("Profile edit for: " + LoggedInUser.getUsername());
-            System.out.println("1. Edit or add Biography");
-            System.out.println("2. Edit or add BirthDate");
-            System.out.println("3. Go Back");
+            CliFormatter.printTypingEffect(CliFormatter.boldYellow("Loading user settings..."));
+            System.out.println(CliFormatter.green("Profile edit for: " + LoggedInUser.getUsername()));
+            System.out.println(CliFormatter.bold("1. Edit or add Biography"));
+            System.out.println(CliFormatter.yellow("2. Edit or add BirthDate"));
+            System.out.println(CliFormatter.cyan("3. Go Back"));
 
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -102,21 +104,21 @@ public class UserController {
                         System.out.print("Enter new Biography: ");
                         String newBio = scanner.nextLine();
                         LoggedInUser = userService.updateBio(LoggedInUser, newBio);
-                        System.out.println("Biography updated successfully.");
+                        CliFormatter.loadingSpinner("Biography updated successfully.");
                         break;
 
                     case 2:
                         System.out.print("Enter new BirthDate(YYYY-MM-DD) : ");
                         String newDate = scanner.nextLine();
                         LoggedInUser = userService.updateDateOfBirth(LoggedInUser, DateConverter.convertStringToDate(newDate));
-                        System.out.println("Birthdate updated successfully.");
+                        CliFormatter.loadingSpinner("Birthdate updated successfully.");
                         break;
 
                     case 3:
                         return;
 
                     default:
-                        System.out.println("Invalid option. Please try again.");
+                        System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
                 }
             }
             catch (Exception e) {

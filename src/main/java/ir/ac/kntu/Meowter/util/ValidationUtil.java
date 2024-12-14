@@ -37,7 +37,7 @@ public class ValidationUtil {
     }
 
     public static void validatePassword(String password) {
-        if (password == null || password.trim().isEmpty()) {
+        if (password == null || password.trim().isEmpty() || password.length() < 8) {
             throw new WeakPasswordException("Password cannot be empty.");
         }
 

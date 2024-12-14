@@ -33,7 +33,6 @@ public class UserRepository {
         save(user);
     }
 
-
     public List<User> findAll() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<User> users = session.createQuery("FROM User", User.class).getResultList();

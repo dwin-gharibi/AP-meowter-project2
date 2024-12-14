@@ -90,7 +90,7 @@ public class UserController {
         while (true) {
             CliFormatter.printTypingEffect(CliFormatter.boldYellow("Loading user settings..."));
             System.out.println(CliFormatter.green("Profile edit for: " + LoggedInUser.getUsername()));
-            System.out.println(CliFormatter.bold("1. Edit or add Biography"));
+            System.out.println(CliFormatter.red("1. Edit or add Biography"));
             System.out.println(CliFormatter.yellow("2. Edit or add BirthDate"));
             System.out.println(CliFormatter.cyan("3. Go Back"));
 

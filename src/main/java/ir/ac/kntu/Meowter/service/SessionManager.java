@@ -46,7 +46,7 @@ public class SessionManager {
                     return null;
                 }
 
-                return sessionData.getUser();
+                return userRepository.findByUsername(sessionData.getUser().getUsername());
             } else {
                 CliFormatter.loadingSpinner(CliFormatter.boldRed("⚠️ No valid session file found!"));
             }

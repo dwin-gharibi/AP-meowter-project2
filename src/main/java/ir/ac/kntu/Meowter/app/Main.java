@@ -1,17 +1,12 @@
 package ir.ac.kntu.Meowter.app;
 
-import java.util.*;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.util.CliFormatter;
-import ir.ac.kntu.Meowter.util.*;
-
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Main {
 
@@ -54,11 +49,9 @@ public class Main {
             role = loggedInUser.getRole();
         }
 
-
         while (true) {
-
             if (loggedInUser == null) {
-                System.out.println(CliFormatter.boldGreen("Welcome to Meowter!"));
+                CliFormatter.printTypingEffect(CliFormatter.boldGreen("\uD83D\uDC3E  Welcome to Meowter \uD83D\uDC3E"));
                 System.out.println(CliFormatter.blue("1. 👤 User"));
                 System.out.println(CliFormatter.green("2. ⚙️ Admin"));
                 System.out.println(CliFormatter.yellow("3. 🛠️ Support User"));
@@ -92,44 +85,60 @@ public class Main {
                 loggedInUser = null;
 
                 if (role == Role.ADMIN || role == Role.SUPPORT) {
-                    System.out.println("1. 🔒 Login");
-                    System.out.print("Choose an option: ");
+                    System.out.println(CliFormatter.boldBlue("1. 🔒 Login"));
+                    System.out.print(CliFormatter.boldGreen("Choose an option (Type anything else for turning back to main menu): "));
                     int choice = scanner.nextInt();
                     scanner.nextLine();
 
                     if (choice == 1) {
-                        System.out.print("Enter your email or username: ");
+                        System.out.print(CliFormatter.boldYellow("Enter your email or username: "));
                         String username = scanner.nextLine();
-                        System.out.print("Enter your password: ");
+                        System.out.print(CliFormatter.boldPurple("Enter your password: "));
                         String password = scanner.nextLine();
 
                         loggedInUser = attemptLogin(userService, username, password, role);
                         if (loggedInUser == null) continue;
                     } else {
-                        System.out.println("Invalid option. Please try again.");
+                        CliFormatter.printTypingEffect("Turning back to main menu...");
                         continue;
                     }
                 } else {
-                    System.out.println("1. 🔒 Login");
-                    System.out.println("2. 📝 Register");
-                    System.out.print("Choose an option: ");
+                    System.out.println(CliFormatter.blue("1. 🔒 Login"));
+                    System.out.println(CliFormatter.cyan("2. 📝 Register"));
+                    System.out.print(CliFormatter.boldGreen("Choose an option (Type anything else for turning back to main menu): "));
                     int choice = scanner.nextInt();
                     scanner.nextLine();
 
                     if (choice == 1) {
-                        System.out.print("Enter your email or username: ");
+                        System.out.print(CliFormatter.boldYellow("Enter your email or username: "));
                         String username = scanner.nextLine();
-                        System.out.print("Enter your password: ");
+                        System.out.print(CliFormatter.boldPurple("Enter your password: "));
                         String password = scanner.nextLine();
 
                         loggedInUser = attemptLogin(userService, username, password, Role.USER);
                         if (loggedInUser == null) continue;
                     } else if (choice == 2) {
-                        System.out.print("Enter a username: ");
+                        System.out.println(CliFormatter.boldBlue("⚠️ Registration Requirements:"));
+                        System.out.println(CliFormatter.bold("Please ensure the following before registering:"));
+                        System.out.println(CliFormatter.boldYellow("1. Username: ") +
+                                CliFormatter.bold("Username should be unique."));
+                        System.out.println(CliFormatter.boldYellow("2. Email: ") +
+                                CliFormatter.bold("Must be a valid and unique email address."));
+                        System.out.println(CliFormatter.boldYellow("3. Password: ") +
+                                CliFormatter.bold("Must be at least 8 characters long and include:"));
+                        System.out.println(CliFormatter.bold("   - ") + "One uppercase letter.");
+                        System.out.println(CliFormatter.bold("   - ") + "One lowercase letter.");
+                        System.out.println(CliFormatter.bold("   - ") + "One number.");
+                        System.out.println(CliFormatter.bold("   - ") + "One special character (e.g., !@#$%).");
+                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("✔️ Ready to register? Follow the prompts below!"));
+
+                        System.out.println("\n------------");
+
+                        System.out.print(CliFormatter.boldPurple("Enter a username: "));
                         String username = scanner.nextLine();
-                        System.out.print("Enter your email: ");
+                        System.out.print(CliFormatter.magenta("Enter your email: "));
                         String email = scanner.nextLine();
-                        System.out.print("Enter your password: ");
+                        System.out.print(CliFormatter.red("Enter your password: "));
                         String password = scanner.nextLine();
 
                         try {
@@ -143,7 +152,7 @@ public class Main {
                             SessionManager.saveSession(loggedInUser);
                         }
                     } else {
-                        System.out.println("Invalid option. Please try again.");
+                        CliFormatter.printTypingEffect("Turning back to main menu...");
                         continue;
                     }
                 }
@@ -153,7 +162,7 @@ public class Main {
                 if(!loggedInUser.isActive()){
                     System.out.println(CliFormatter.boldRed("Your account is Inactive!"));
                     System.out.println(CliFormatter.yellow("For getting more information contact with admin."));
-                    System.out.println("Logging out...");
+                    CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
                     SessionManager.clearSession();
                     loggedInUser = null;
                 }
@@ -169,10 +178,10 @@ public class Main {
                     menuHandler.displayMainMenu(loggedInUser, role);
                 }
 
-                System.out.println("Do you want to log out? (y/n): ");
+                CliFormatter.printTypingEffect("Do you want to log out? (y/n): ");
                 String logoutChoice = scanner.nextLine();
                 if ("y".equalsIgnoreCase(logoutChoice)) {
-                    System.out.println("Logging out...");
+                    CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
                     SessionManager.clearSession();
                     loggedInUser = null;
                 }
@@ -194,11 +203,11 @@ public class Main {
                 System.out.println(CliFormatter.red("Access denied. You do not have the proper role to log in as " + expectedRole + "."));
                 loggedInUser = null;
             } else {
-                System.out.println("Login successful!");
+                System.out.println(CliFormatter.boldGreen("Login successful!"));
                 SessionManager.saveSession(loggedInUser);
             }
         } else {
-            System.out.println("Invalid email/username or password.");
+            System.out.println(CliFormatter.boldRed("Invalid email/username or password."));
         }
         return loggedInUser;
     }

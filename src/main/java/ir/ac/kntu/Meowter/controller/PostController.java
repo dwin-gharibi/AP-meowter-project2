@@ -1,33 +1,40 @@
 package ir.ac.kntu.Meowter.controller;
 
+import ir.ac.kntu.Meowter.model.Comment;
+import ir.ac.kntu.Meowter.model.Like;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.repository.PostRepository;
 import ir.ac.kntu.Meowter.service.PostService;
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.PaginationUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class PostController {
 
     private PostService postService;
+    private PostRepository postRepository;
 
     public PostController() {
         this.postService = new PostService();
+        this.postRepository = new PostRepository();
     }
 
     public void displayPostsSection(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\nPosts Section");
-            System.out.println("1. View My Posts");
-            System.out.println("2. Add a New Post");
-            System.out.println("3. Edit a Post");
-            System.out.println("4. Delete a Post");
-            System.out.println("5. Manage Comments");
-            System.out.println("6. Handle Requests (L[id], C[id], #[hashtag])");
-            System.out.println("7. Back to Main Menu");
-            System.out.print("Choose an option: ");
+            CliFormatter.printTypingEffect(CliFormatter.boldYellow("Welcome to post section:"));
+            System.out.println(CliFormatter.boldBlue("1. View My Posts"));
+            System.out.println(CliFormatter.boldGreen("2. Add a New Post"));
+            System.out.println(CliFormatter.boldBlue("3. Select a post"));
+            System.out.println(CliFormatter.boldYellow("4. Handle Requests (L[id], C[id], #[hashtag])"));
+            System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
+            System.out.print(CliFormatter.magenta("Choose an option: "));
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -39,21 +46,15 @@ public class PostController {
                     addNewPost(loggedInUser, scanner);
                     break;
                 case 3:
-                    editPost(loggedInUser, scanner);
+                    selectPost(loggedInUser, scanner);
                     break;
                 case 4:
-                    deletePost(loggedInUser, scanner);
-                    break;
-                case 5:
-                    manageComments(loggedInUser, scanner);
-                    break;
-                case 6:
                     handleRequests(loggedInUser, scanner);
                     break;
-                case 7:
+                case 5:
                     return;
                 default:
-                    System.out.println("Invalid option. Try again.");
+                    System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
                     break;
             }
         }
@@ -61,10 +62,41 @@ public class PostController {
 
     private void displayUserPosts(User loggedInUser) {
         List<Post> posts = postService.getUserPosts(loggedInUser);
-        if (posts.isEmpty()) {
-            System.out.println("You haven't created any posts yet.");
+
+        if (!posts.isEmpty()) {
+            CliFormatter.printTypingEffect(CliFormatter.bold("\n📸 Posts:\n"));
+            List<String> post_details = new ArrayList<>();
+
+            posts.forEach(post -> {
+                String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
+                        "Content: " + CliFormatter.boldGreen(post.getContent()) + "\n" +
+                        "Created At: " + CliFormatter.boldBlue(post.getCreatedAt().toString()) + "\n" +
+                        "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" +
+                        "Hashtags: " + (post.getHashtags().isEmpty()
+                        ? CliFormatter.red("No hashtags")
+                        : CliFormatter.cyan(post.getHashtags().toString())) + "\n" +
+                        "Comments:\n";
+
+                if (!post.getComments().isEmpty()) {
+                    StringBuilder commentsDetails = new StringBuilder();
+                    post.getComments().forEach(comment -> {
+                        commentsDetails.append("    - Comment by ")
+                                .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                .append(": ")
+                                .append(CliFormatter.cyan(comment.getContent()))
+                                .append("\n");
+                    });
+                    postDetail += commentsDetails.toString();
+                } else {
+                    postDetail += CliFormatter.red("    No comments yet.\n");
+                }
+
+                post_details.add(postDetail);
+            });
+
+            PaginationUtil.paginate(post_details);
         } else {
-            posts.forEach(post -> System.out.println("Post ID: " + post.getId() + " | Content: " + post.getContent()));
+            System.out.println(CliFormatter.red("\n📸 Posts: No posts yet.\n"));
         }
     }
 
@@ -72,16 +104,139 @@ public class PostController {
         System.out.print("Enter post content: ");
         String content = scanner.nextLine();
         postService.addPost(loggedInUser, content);
-        System.out.println("Post added successfully.");
     }
 
-    private void editPost(User loggedInUser, Scanner scanner) {
-        System.out.print("Enter Post ID to edit: ");
-        long postIdToEdit = scanner.nextLong();
+    private void selectPost(User loggedInUser, Scanner scanner) {
+        System.out.print("Enter Post ID to select: ");
+        long postIdToSelect = scanner.nextLong();
         scanner.nextLine();
+        Post selectedPost = null;
+
+        while (true) {
+            CliFormatter.progressBar(CliFormatter.boldGreen("Loading the post ..."), 10);
+
+            try {
+                selectedPost = postRepository.findById(postIdToSelect);
+                if (selectedPost == null) {
+                    throw new Exception("Post does not exist");
+                }
+                String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(selectedPost.getId())) + "\n" +
+                        "Content: " + CliFormatter.boldGreen(selectedPost.getContent()) + "\n" +
+                        "Created At: " + CliFormatter.boldBlue(selectedPost.getCreatedAt().toString()) + "\n" +
+                        "Likes: " + CliFormatter.yellow(String.valueOf(selectedPost.getLikes().size())) + "\n" +
+                        "Hashtags: " + (selectedPost.getHashtags().isEmpty()
+                        ? CliFormatter.red("No hashtags")
+                        : CliFormatter.cyan(selectedPost.getHashtags().toString())) + "\n" +
+                        "Comments:\n";
+
+                if (!selectedPost.getComments().isEmpty()) {
+                    StringBuilder commentsDetails = new StringBuilder();
+                    selectedPost.getComments().forEach(comment -> {
+                        commentsDetails.append("    - Comment by ")
+                                .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                .append(": ")
+                                .append(CliFormatter.cyan(comment.getContent()))
+                                .append("\n");
+                    });
+                    postDetail += commentsDetails.toString();
+                } else {
+                    postDetail += CliFormatter.red("    No comments yet.\n");
+                }
+
+                System.out.println(postDetail);
+            } catch (Exception e){
+                System.out.println(CliFormatter.boldRed("Something went wrong"));
+                return;
+            }
+
+            System.out.println(CliFormatter.boldBlue("1. Edit post"));
+            System.out.println(CliFormatter.boldGreen("2. Delete post"));
+            System.out.println(CliFormatter.boldBlue("3. Likes Details"));
+            System.out.println(CliFormatter.boldYellow("4. Comments Details"));
+            System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
+            System.out.print(CliFormatter.magenta("Choose an option: "));
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    editPost(loggedInUser, selectedPost);
+                    break;
+                case 2:
+                    deletePost(loggedInUser, selectedPost);
+                    break;
+                case 3:
+                    likeDetails(selectedPost);
+                    break;
+                case 4:
+                    commentsDetails(loggedInUser, selectedPost);
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
+                    break;
+            }
+        }
+    }
+
+    private void likeDetails(Post selectedPost) {
+        CliFormatter.progressBar(CliFormatter.boldGreen("Getting like details..."), 10);
+
+        CliFormatter.printTypingEffect(CliFormatter.boldYellow("Post liked by:"));
+
+        Set<Like> likes = selectedPost.getLikes();
+
+        if (likes.isEmpty()) {
+            System.out.println(CliFormatter.boldPurple("No likes yet."));
+            return;
+        }
+
+        for(Like like : likes) {
+            System.out.print(CliFormatter.blue(like.getUser().getUsername()) + " ");
+        }
+    }
+
+    private void commentsDetails(User loggedInUser, Post selectedPost) {
+        CliFormatter.progressBar(CliFormatter.boldGreen("Getting comments details..."), 10);
+
+        CliFormatter.printTypingEffect(CliFormatter.boldYellow("Post commented by:"));
+
+
+        Set<Comment> comments = selectedPost.getComments();
+
+        if (comments.isEmpty()) {
+            System.out.println(CliFormatter.boldPurple("No comments yet."));
+            return;
+        }
+
+        for(Comment comment : comments) {
+            System.out.println(CliFormatter.blue(CliFormatter.boldBlue("#" + comment.getId()) + " @" + CliFormatter.magenta(comment.getUser().getUsername()) + " : " + CliFormatter.cyan(comment.getContent())));
+        }
+
+        while (true) {
+            System.out.print(CliFormatter.magenta("Enter comment id to remove (or back): "));
+            Scanner scanner = new Scanner(System.in);
+            String commentId = scanner.nextLine();
+
+            if (commentId.equalsIgnoreCase("back")) {
+                return;
+            }
+
+            try {
+                postRepository.removeComment(loggedInUser, selectedPost, Long.parseLong(commentId));
+            } catch (Exception e) {
+                System.out.println(CliFormatter.boldRed("Something went wrong"));
+            }
+        }
+
+    }
+
+    private void editPost(User loggedInUser, Post selectedPost) {
         System.out.print("Enter new content: ");
+        Scanner scanner = new Scanner(System.in);
         String newContent = scanner.nextLine();
-        boolean success = postService.editPost(loggedInUser, postIdToEdit, newContent);
+        boolean success = postService.editPost(loggedInUser, selectedPost.getId(), newContent);
         if (success) {
             System.out.println("Post updated successfully.");
         } else {
@@ -89,23 +244,13 @@ public class PostController {
         }
     }
 
-    private void deletePost(User loggedInUser, Scanner scanner) {
-        System.out.print("Enter Post ID to delete: ");
-        long postIdToDelete = scanner.nextLong();
-        boolean success = postService.deletePost(loggedInUser, postIdToDelete);
+    private void deletePost(User loggedInUser, Post selectedPost) {
+        boolean success = postService.deletePost(loggedInUser, selectedPost.getId());
         if (success) {
             System.out.println("Post deleted successfully.");
         } else {
             System.out.println("Failed to delete post. Make sure you are the owner of the post.");
         }
-    }
-
-    private void manageComments(User loggedInUser, Scanner scanner) {
-        System.out.print("Enter Post ID to manage comments: ");
-        long postIdToManage = scanner.nextLong();
-        scanner.nextLine();
-        System.out.println("Comment management not yet implemented. Placeholder for future functionality.");
-
     }
 
     private void handleRequests(User loggedInUser, Scanner scanner) {

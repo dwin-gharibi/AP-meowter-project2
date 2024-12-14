@@ -1,5 +1,7 @@
 package ir.ac.kntu.Meowter.util;
 
+import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,17 +14,19 @@ public class PaginationUtil {
         int currentPage = 1;
         Scanner scanner = new Scanner(System.in);
 
+        CliFormatter.progressBar(CliFormatter.boldYellow("Loading pages..."), 10);
+
         while (true) {
             displayPage(data, currentPage, totalPages);
             System.out.println();
-            System.out.println("Options: [n]ext, [p]revious, [q]uit, [Page Number]");
+            System.out.println("Options: " + CliFormatter.boldYellow("[n]") + "ext, " + CliFormatter.boldGreen("[p]") + "revious, " + CliFormatter.boldRed("[q]") + "uit, [Page Number]");
             System.out.println("Current Page: " + CliFormatter.blue(String.valueOf(currentPage)) +
                     " | Total Pages: " + CliFormatter.green(String.valueOf(totalPages)));
             System.out.print("Enter your choice: ");
             String input = scanner.nextLine();
 
             if ("q".equalsIgnoreCase(input)) {
-                System.out.println("Exiting pagination...");
+                System.out.println(CliFormatter.boldRed("Exiting pagination..."));
                 return;
             } else if ("n".equalsIgnoreCase(input)) {
                 if (currentPage < totalPages) {

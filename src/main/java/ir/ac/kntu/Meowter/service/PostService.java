@@ -143,7 +143,7 @@ public class PostService {
         return postRepository.findByUser(user);
     }
 
-    public void addPost(User user, String content) {
+    public void addPost(User user, String content, boolean flagChecker, boolean flagDescribe) {
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("User must not be null and must have a valid ID.");
         }
@@ -154,15 +154,16 @@ public class PostService {
             return;
         }
 
-//        String textWithErrors = "this is a example of text with wrong grammer, punctuations are also wrong";
-//        String correctedText = checkGrammarAndPunctuation(textWithErrors);
-//        System.out.println("Corrected Text: " + correctedText);
+        if (flagChecker){
+            content = checkGrammarAndPunctuation(content);
+        }
 
-//        String description = PostDescriptionUtil.describePost(content);
-//        System.out.println("Post Description: " + description);
+        if (flagDescribe) {
+            content = PostDescriptionUtil.describePost(content);
+        }
+
 
         redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
-
 
 
         Post post = new Post(content, user);

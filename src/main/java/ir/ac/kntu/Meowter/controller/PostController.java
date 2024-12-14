@@ -101,9 +101,16 @@ public class PostController {
     }
 
     private void addNewPost(User loggedInUser, Scanner scanner) {
-        System.out.print("Enter post content: ");
+        System.out.print(CliFormatter.magenta("Enter post content: "));
         String content = scanner.nextLine();
-        postService.addPost(loggedInUser, content);
+
+        System.out.print(CliFormatter.boldGreen("- Do you want @AI to correct your post grammar and punctuation? "));
+        boolean flagChecker = scanner.nextBoolean();
+
+        System.out.print(CliFormatter.boldBlue("- Do you want @AI to describe your post? "));
+        boolean flagDescribe = scanner.nextBoolean();
+
+        postService.addPost(loggedInUser, content, flagChecker, flagDescribe);
     }
 
     private void selectPost(User loggedInUser, Scanner scanner) {

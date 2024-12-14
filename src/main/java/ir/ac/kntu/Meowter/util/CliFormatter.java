@@ -12,6 +12,15 @@ public class CliFormatter {
     public static final String MAGENTA = "\033[35m";
     public static final String CYAN = "\033[36m";
     public static final String WHITE = "\033[37m";
+    private static final String PURPLE = "\u001B[35m";
+
+    public static String boldBlue(String text) {
+        return BOLD + BLUE + text + RESET;
+    }
+
+    public static String boldPurple(String text) {
+        return BOLD + PURPLE + text + RESET;
+    }
 
     public static String bold(String text) {
         return BOLD + text + RESET;

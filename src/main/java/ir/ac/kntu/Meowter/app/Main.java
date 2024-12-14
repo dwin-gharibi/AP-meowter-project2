@@ -54,6 +54,7 @@ public class Main {
             role = loggedInUser.getRole();
         }
 
+
         while (true) {
 
             if (loggedInUser == null) {

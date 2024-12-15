@@ -8,6 +8,7 @@ import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.PaginationUtil;
 import ir.ac.kntu.Meowter.util.DateConverter;
+import ir.ac.kntu.Meowter.util.SearchUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,27 +256,27 @@ public class UserController {
 
                     break;
 
-                case 4:
+                case 3:
                     System.out.print("Enter username to search: ");
                     String searchTerm = scanner.nextLine();
-                    User foundUser = userService.searchUserByUsername(searchTerm);
-                    if (foundUser != null) {
-                        System.out.println("Username: @" + foundUser.getUsername() + " | Email: " + foundUser.getEmail());
-                        if (foundUser.isPrivate() && !loggedInUser.getFollowing().contains(foundUser)) {
-                            System.out.println("This profile is private. Follow to see posts.");
-                        }
+                    List<String> usernames = new ArrayList<>();
+                    List <User> users = userService.getAllUsers();
+                    users.forEach(user -> usernames.add(user.getUsername()));
+                    List<String> users_list = SearchUtil.search(searchTerm, usernames);
+
+                    if (users_list.isEmpty()) {
+                        System.out.println(CliFormatter.red("No users found."));
                     } else {
-                        System.out.println("User not found.");
+                        for (String user : users_list) {
+                            User userInfo = userService.searchUserByUsername(user);
+                            displayUserProfile(loggedInUser, userInfo);
+                        }
                     }
-                    break;
-
-                case 5:
-                    System.out.print("Enter #username to follow: ");
-                    String targetUser = scanner.nextLine().substring(1);
 
                     break;
 
-                case 6:
+
+                case 4:
                     System.out.println("Your Follow Requests (Sent & Received):");
                     userService.getFollowRequests(loggedInUser).forEach(request -> {
                         String requesterUsername = request.getRequester().getUsername();
@@ -301,23 +302,11 @@ public class UserController {
                     });
                     break;
 
-                case 7:
-                    System.out.print("Enter the username of the follower to remove: ");
-
-                    break;
-
-                case 8:
-                    System.out.print("Enter the username of the user to unfollow: ");
-                    String unfollowUsername = scanner.nextLine();
-                    User unfollowUser = userService.searchUserByUsername(unfollowUsername);
-
-                    break;
-
-                case 9:
+                case 5:
                     return;
 
                 default:
-                    System.out.println("Invalid option. Try again.");
+                    System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
                     break;
             }
         }

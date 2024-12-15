@@ -317,13 +317,41 @@ public class PostController {
     }
 
     private void handleHashtagSearch(String input) {
-        String hashtag = input.substring(1);
-        List<Post> posts = postService.searchPostsByHashtag(hashtag);
-        if (posts.isEmpty()) {
-            System.out.println("No posts found with hashtag #" + hashtag);
+        List<Post> posts = postService.searchPostsByHashtag(input);
+        if (!posts.isEmpty()) {
+            CliFormatter.printTypingEffect(CliFormatter.bold("\n📸 Posts:\n"));
+            List<String> post_details = new ArrayList<>();
+
+            posts.forEach(post -> {
+                String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
+                        "Content: " + CliFormatter.boldGreen(post.getContent()) + "\n" +
+                        "Created At: " + CliFormatter.boldBlue(post.getCreatedAt().toString()) + "\n" +
+                        "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" +
+                        "Hashtags: " + (post.getHashtags().isEmpty()
+                        ? CliFormatter.red("No hashtags")
+                        : CliFormatter.cyan(post.getHashtags().toString())) + "\n" +
+                        "Comments:\n";
+
+                if (!post.getComments().isEmpty()) {
+                    StringBuilder commentsDetails = new StringBuilder();
+                    post.getComments().forEach(comment -> {
+                        commentsDetails.append("    - Comment by ")
+                                .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                .append(": ")
+                                .append(CliFormatter.cyan(comment.getContent()))
+                                .append("\n");
+                    });
+                    postDetail += commentsDetails.toString();
+                } else {
+                    postDetail += CliFormatter.red("    No comments yet.\n");
+                }
+
+                post_details.add(postDetail);
+            });
+
+            PaginationUtil.paginate(post_details);
         } else {
-            System.out.println("Posts with hashtag #" + hashtag + ":");
-            posts.forEach(post -> System.out.println("Post ID: " + post.getId() + " | Content: " + post.getContent()));
+            System.out.println(CliFormatter.red("\n📸 Posts: No posts yet.\n"));
         }
     }
 }

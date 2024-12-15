@@ -16,6 +16,8 @@ import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.DateConverter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -121,9 +123,6 @@ public class MenuHandler {
             System.out.println(CliFormatter.boldPurple("4. Go Back"));
 
 
-            System.out.println(start_date);
-            System.out.println(end_date);
-
             System.out.print(CliFormatter.green("Choose an option: "));
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -137,11 +136,78 @@ public class MenuHandler {
 
                 case 2:
                     List<Post> posts = postService.getPostsFromFollowings(loggedInUser);
-                    for (Post post : posts) {
-                        System.out.println(post.getContent());
-                    }
-                    break;
+                    CliFormatter.progressBar(CliFormatter.boldGreen("Loading the post ..."), 10);
 
+                    if (posts.isEmpty()) {
+                        System.out.println(CliFormatter.boldRed("No posts founded!"));
+                        break;
+                    }
+
+                    Date start_date_new = Date.from(start_date.atZone(ZoneId.systemDefault()).toInstant());
+                    Date end_date_new = Date.from(end_date.atZone(ZoneId.systemDefault()).toInstant());
+
+
+                    for (Post selectedPost : posts) {
+
+                        if (start_date_new != null && selectedPost.getCreatedAt().before(start_date_new)) {
+                            continue;
+                        }
+
+                        if (end_date_new != null && selectedPost.getCreatedAt().after(end_date_new)) {
+                            continue;
+                        }
+
+                        try {
+                            String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(selectedPost.getId())) + "\n" +
+                                    "Content: " + CliFormatter.boldGreen(selectedPost.getContent()) + "\n" +
+                                    "Created At: " + CliFormatter.boldBlue(selectedPost.getCreatedAt().toString()) + "\n" +
+                                    "Likes: " + CliFormatter.yellow(String.valueOf(selectedPost.getLikes().size())) + "\n" +
+                                    "Hashtags: " + (selectedPost.getHashtags().isEmpty()
+                                    ? CliFormatter.red("No hashtags")
+                                    : CliFormatter.cyan(selectedPost.getHashtags().toString())) + "\n" +
+                                    "Comments:\n";
+
+                            if (!selectedPost.getComments().isEmpty()) {
+                                StringBuilder commentsDetails = new StringBuilder();
+                                selectedPost.getComments().forEach(comment -> {
+                                    commentsDetails.append("    - Comment by ")
+                                            .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                            .append(": ")
+                                            .append(CliFormatter.cyan(comment.getContent()))
+                                            .append("\n");
+                                });
+                                postDetail += commentsDetails.toString();
+                            } else {
+                                postDetail += CliFormatter.red("    No comments yet.\n");
+                            }
+
+                            System.out.println(postDetail);
+                        } catch (Exception e){
+                            System.out.println(CliFormatter.boldRed("Something went wrong"));
+                            return;
+                        }
+                    }
+
+
+
+                    while (true) {
+                        System.out.println(CliFormatter.boldYellow("1. Handle Requests (L[id], C[id], #[hashtag])"));
+                        System.out.println(CliFormatter.boldPurple("2. Back to Main Menu"));
+                        System.out.print(CliFormatter.magenta("Choose an option: "));
+                        int choice_request = scanner.nextInt();
+                        scanner.nextLine();
+
+                        switch (choice_request) {
+                            case 1:
+                                postController.handleRequests(loggedInUser, scanner);
+                                break;
+                            case 2:
+                                break;
+                            default:
+                                System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
+                                break;
+                        }
+                    }
                 case 3:
                     System.out.print("Enter date filters: (YYYY-mm-dd|YYYY-mm-dd) \nNote: They can also be empty for open ranges.\n");
                     String dateStr = scanner.nextLine();

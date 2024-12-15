@@ -260,7 +260,7 @@ public class PostController {
         }
     }
 
-    private void handleRequests(User loggedInUser, Scanner scanner) {
+    public void handleRequests(User loggedInUser, Scanner scanner) {
         System.out.println("Handle requests like L[id], C[id], #[hashtag]. Type 'back' to return.");
         while (true) {
             System.out.print("Enter your request: ");

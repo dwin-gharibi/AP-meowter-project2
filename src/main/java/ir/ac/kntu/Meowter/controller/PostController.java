@@ -8,6 +8,7 @@ import ir.ac.kntu.Meowter.repository.PostRepository;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.PaginationUtil;
+import ir.ac.kntu.Meowter.util.RedisHashtagUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class PostController {
 
     public void displayPostsSection(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
+
+        System.out.println(CliFormatter.boldYellow("🔥 Top 5 Hashtags 🔥"));
+        RedisHashtagUtil.displayTopHashtags(5);
 
         while (true) {
             CliFormatter.printTypingEffect(CliFormatter.boldYellow("Welcome to post section:"));

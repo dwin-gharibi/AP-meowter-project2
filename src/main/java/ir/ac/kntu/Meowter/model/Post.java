@@ -1,5 +1,7 @@
 package ir.ac.kntu.Meowter.model;
 
+import ir.ac.kntu.Meowter.util.RedisHashtagUtil;
+
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +49,8 @@ public class Post {
                 .filter(word -> word.startsWith("#"))
                 .map(word -> word.replaceAll("[^a-zA-Z0-9_#]", ""))
                 .collect(Collectors.toSet());
+
+        this.hashtags.forEach(RedisHashtagUtil::incrementHashtag);
     }
 
 

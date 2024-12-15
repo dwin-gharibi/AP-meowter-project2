@@ -90,6 +90,13 @@ public class Main {
 
                 loggedInUser = null;
 
+                try {
+                    ArithmeticCaptchaUtil.askCaptchaOrThrow();
+                } catch (CaptchaVerificationException e) {
+                    System.out.println(CliFormatter.boldRed(e.getMessage()));
+                    break;
+                }
+
                 if (role == Role.ADMIN || role == Role.SUPPORT) {
                     System.out.println(CliFormatter.boldBlue("1. 🔒 Login"));
                     System.out.print(CliFormatter.boldGreen("Choose an option (Type anything else for turning back to main menu): "));
@@ -109,13 +116,6 @@ public class Main {
                         continue;
                     }
                 } else {
-
-                    try {
-                        ArithmeticCaptchaUtil.askCaptchaOrThrow();
-                    } catch (CaptchaVerificationException e) {
-                        System.out.println(CliFormatter.boldRed(e.getMessage()));
-                        break;
-                    }
 
                     System.out.println(CliFormatter.blue("1. 🔒 Login"));
                     System.out.println(CliFormatter.cyan("2. 📝 Register"));

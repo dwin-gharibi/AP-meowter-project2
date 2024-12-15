@@ -5,8 +5,10 @@ import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
+import ir.ac.kntu.Meowter.util.ArithmeticCaptchaUtil;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.DateConverter;
+import ir.ac.kntu.Meowter.exceptions.CaptchaVerificationException;
 
 import java.util.Scanner;
 
@@ -107,6 +109,14 @@ public class Main {
                         continue;
                     }
                 } else {
+
+                    try {
+                        ArithmeticCaptchaUtil.askCaptchaOrThrow();
+                    } catch (CaptchaVerificationException e) {
+                        System.out.println(CliFormatter.boldRed(e.getMessage()));
+                        break;
+                    }
+
                     System.out.println(CliFormatter.blue("1. 🔒 Login"));
                     System.out.println(CliFormatter.cyan("2. 📝 Register"));
                     System.out.print(CliFormatter.boldGreen("Choose an option (Type anything else for turning back to main menu): "));

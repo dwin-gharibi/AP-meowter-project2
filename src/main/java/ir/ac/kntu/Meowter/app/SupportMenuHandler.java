@@ -28,11 +28,11 @@ public class SupportMenuHandler {
     public void displaySupportMenu(User supportUser) {
         System.out.println(CliFormatter.boldGreen("Welcome to the Support Panel, " + supportUser.getUsername() + "!"));
         while (true) {
-            System.out.println(CliFormatter.boldYellow("Support Menu:"));
-            System.out.println("1. View All Reports");
-            System.out.println("2. Respond to a Report");
-            System.out.println("3. Find a User");
-            System.out.println("4. Logout");
+            CliFormatter.printTypingEffect(CliFormatter.boldYellow("Support Menu:"));
+            System.out.println(CliFormatter.boldRed("1. View All Reports"));
+            System.out.println(CliFormatter.boldPurple("2. Respond to a Report"));
+            System.out.println(CliFormatter.boldGreen("3. Find a User"));
+            System.out.println(CliFormatter.boldRed("4. Logout"));
 
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();

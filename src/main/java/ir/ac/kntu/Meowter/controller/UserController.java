@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.controller;
 
 import ir.ac.kntu.Meowter.model.Post;
+import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.model.User;
@@ -134,12 +135,18 @@ public class UserController {
 
         while (true) {
             CliFormatter.printTypingEffect(CliFormatter.boldYellow("Welcome to users section:"));
-            System.out.println(CliFormatter.boldGreen("    - You can also type #username to immediately send follow request."));
-            System.out.println(CliFormatter.boldPurple("1. View Followers"));
-            System.out.println(CliFormatter.boldGreen("2. View Followings"));
+            if (loggedInUser.getRole() != Role.SUPPORT){
+                System.out.println(CliFormatter.boldGreen("    - You can also type #username to immediately send follow request."));
+                System.out.println(CliFormatter.boldPurple("1. View Followers"));
+                System.out.println(CliFormatter.boldGreen("2. View Followings"));
+            }
+
             System.out.println(CliFormatter.boldBlue("3. Search Users"));
 
-            System.out.println(CliFormatter.boldYellow("4. View Follow Requests (Received & Sent)"));
+            if (loggedInUser.getRole() != Role.SUPPORT){
+                System.out.println(CliFormatter.boldYellow("4. View Follow Requests (Received & Sent)"));
+            }
+
             System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
             System.out.print(CliFormatter.cyan("Choose an option: "));
 
@@ -374,6 +381,10 @@ public class UserController {
             } else {
                 System.out.println(CliFormatter.red("\n📸 Posts: No posts yet.\n"));
             }
+        }
+
+        if (loggedInUser.getRole() == Role.SUPPORT) {
+            return;
         }
 
         Scanner scanner = new Scanner(System.in);

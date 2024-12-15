@@ -33,29 +33,7 @@ public class TicketController {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            CliFormatter.printTypingEffect(CliFormatter.boldGreen("Welcome to ticket section:"));
-
-
-            if (loggedInUser.getRole() == Role.SUPPORT){
-                System.out.println("0. Ban a Ticket User");
-                System.out.println("1. Set Warning on Ticket");
-            } else{
-                System.out.println(CliFormatter.boldGreen("1. Create Ticket"));
-            }
-
-            if (loggedInUser.getRole() == Role.SUPPORT){
-                System.out.println("2. View All Tickets");
-            } else{
-                System.out.println(CliFormatter.boldBlue("2. View My Tickets"));
-            }
-
-            if (loggedInUser.getRole() == Role.SUPPORT){
-                System.out.println("3. Respond to Ticket");
-                System.out.println("4. Close Ticket");
-
-            }
-            System.out.println(CliFormatter.boldRed("5. Back to User Menu"));
-            System.out.print(CliFormatter.magenta("Choose an option: "));
+            displayTicketMenu(loggedInUser);
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -74,109 +52,13 @@ public class TicketController {
                     }
                     break;
                 case 1:
-                    System.out.print(CliFormatter.boldGreen("Enter ticket description: "));
-                    String description = scanner.nextLine();
-                    System.out.println(CliFormatter.boldBlue("Choose ticket subject:"));
-                    System.out.println("1. Report Issue");
-                    System.out.println("2. User Settings (+Username)");
-                    System.out.println("3. Profile Issue");
-                    System.out.println("4. Other");
-                    System.out.print(CliFormatter.magenta("Choose an option: "));
-                    int subjectChoice = scanner.nextInt();
-                    scanner.nextLine();
-                    String username = null;
-
-                    if (subjectChoice == 2) {
-                        System.out.println(CliFormatter.boldBlue("Please provide username for report:"));
-
-                        try {
-                            username = scanner.nextLine();
-                            User user = userService.searchUserByUsername(username);
-                            if (user == null) {
-                                throw new NotExistingUserException(CliFormatter.boldRed("User not found"));
-                            }
-                        } catch (Exception e) {
-                            System.out.println(CliFormatter.boldRed("User not found"));
-                        }
-
-                    }
-
-
-                    TicketSubject subject = TicketSubject.values()[subjectChoice - 1];
-                    Ticket ticket = ticketService.createTicket(description, subject, loggedInUser.getUsername());
-
-                    if (subjectChoice == 2){
-                        ticket.setReportUsername(username);
-                    }
-
-                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Creating Ticket..."));
-                    System.out.println("Ticket created successfully. Ticket ID: " + CliFormatter.boldBlue("#" + ticket.getId()));
+                    createTicketSection(loggedInUser);
                     break;
                 case 2:
-                    System.out.println("Your Tickets:");
-                    CliFormatter.loadingSpinner("Waiting for tickets ...");
-                    List<String> ticket_details = new ArrayList<>();
-
-                    if (loggedInUser.getRole() == Role.SUPPORT) {
-                        ticketService.getAllTickets().forEach(t -> {
-                            String message = CliFormatter.boldYellow(t.getDescription());
-                            String response = t.getResponse() == null
-                                    ? CliFormatter.red("No Response Available")
-                                    : CliFormatter.boldGreen(t.getResponse());
-                            String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
-                            String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
-                            String warning = t.getIsWarned()
-                                    ? CliFormatter.boldRed("Yes")
-                                    : CliFormatter.green("No");
-                            String warningMessage = t.getReportWarning() == null ? "" : t.getReportWarning();
-                            String ticketUser = t.getReportUsername() == null ? " " : t.getReportUsername();
-                            ticket_details.add("Ticket ID: " + ticketIdOut +
-                                    " | Status: " + status +
-                                    "\nMessage: " + message + CliFormatter.boldRed(ticketUser) +
-                                    "\nResponse: " + response +
-                                    "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
-                        });
-
-                        PaginationUtil.paginate(ticket_details);
-                    } else {
-                        ticketService.getUserTickets(loggedInUser.getUsername()).forEach(t -> {
-                            String message = CliFormatter.boldYellow(t.getDescription());
-                            String response = t.getResponse() == null
-                                    ? CliFormatter.red("No Response Available")
-                                    : CliFormatter.boldGreen(t.getResponse());
-                            String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
-                            String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
-                            String warning = t.getIsWarned()
-                                    ? CliFormatter.boldRed("Yes")
-                                    : CliFormatter.green("No");
-                            String warningMessage = t.getReportWarning() == null ? "" : t.getReportWarning();
-
-
-                            ticket_details.add("Ticket ID: " + ticketIdOut +
-                                    " | Status: " + status +
-                                    "\nMessage: " + message +
-                                    "\nResponse: " + response +
-                                    "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
-                        });
-
-                        PaginationUtil.paginate(ticket_details);
-                    }
+                    viewTicketSection(loggedInUser);
                     break;
                 case 3:
-                    System.out.print("Enter Ticket ID to respond: ");
-                    long ticketId = scanner.nextLong();
-                    scanner.nextLine();
-                    Ticket ticketToRespond = ticketRepository.findById(ticketId);
-                    if (ticketToRespond != null) {
-                        if (ticketToRespond.getUsername().equals(loggedInUser.getUsername()) || loggedInUser.getRole() == Role.SUPPORT) {
-                            System.out.print("Enter response: ");
-                            String response = scanner.nextLine();
-                            ticketService.respondToTicket(ticketToRespond, response);
-                            System.out.println("Response added successfully.");
-                        }
-                    } else {
-                        System.out.println("Ticket not found or invalid.");
-                    }
+                    responseTicketSection(loggedInUser);
                     break;
                 case 4:
                     System.out.print("Enter Ticket ID to close: ");
@@ -197,4 +79,118 @@ public class TicketController {
             }
         }
     }
+
+    void displayTicketMenu(User loggedInUser) {
+        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Welcome to ticket section:"));
+
+
+        if (loggedInUser.getRole() == Role.SUPPORT){
+            System.out.println("0. Ban a Ticket User");
+            System.out.println("1. Set Warning on Ticket");
+        } else{
+            System.out.println(CliFormatter.boldGreen("1. Create Ticket"));
+        }
+
+        if (loggedInUser.getRole() == Role.SUPPORT){
+            System.out.println("2. View All Tickets");
+        } else{
+            System.out.println(CliFormatter.boldBlue("2. View My Tickets"));
+        }
+
+        if (loggedInUser.getRole() == Role.SUPPORT){
+            System.out.println("3. Respond to Ticket");
+            System.out.println("4. Close Ticket");
+
+        }
+        System.out.println(CliFormatter.boldRed("5. Back to User Menu"));
+        System.out.print(CliFormatter.magenta("Choose an option: "));
+    }
+
+    void viewTicketSection(User loggedInUser) {
+        System.out.println("Your Tickets:");
+        CliFormatter.loadingSpinner("Waiting for tickets ...");
+        List<String> ticket_details = new ArrayList<>();
+
+        if (loggedInUser.getRole() == Role.SUPPORT) {
+            ticketService.getAllTickets().forEach(t -> {
+                String message = CliFormatter.boldYellow(t.getDescription());
+                String response = t.getResponse() == null ? CliFormatter.red("No Response Available") : CliFormatter.boldGreen(t.getResponse());
+                String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
+                String warning = t.getIsWarned() ? CliFormatter.boldRed("Yes") : CliFormatter.green("No");
+                String warningMessage = t.getReportWarning() == null ? "" : t.getReportWarning();
+                String ticketUser = t.getReportUsername() == null ? " " : t.getReportUsername();
+                ticket_details.add("Ticket ID: " + ticketIdOut + " | Status: " + status + "\nMessage: " + message + CliFormatter.boldRed(ticketUser) + "\nResponse: " + response + "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
+            });
+            PaginationUtil.paginate(ticket_details);
+        } else {
+            ticketService.getUserTickets(loggedInUser.getUsername()).forEach(t -> {
+                String message = CliFormatter.boldYellow(t.getDescription());
+                String response = t.getResponse() == null ? CliFormatter.red("No Response Available") : CliFormatter.boldGreen(t.getResponse());
+                String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
+                String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
+                String warning = t.getIsWarned() ? CliFormatter.boldRed("Yes") : CliFormatter.green("No");
+                String warningMessage = t.getReportWarning() == null ? "" : t.getReportWarning();
+                ticket_details.add("Ticket ID: " + ticketIdOut + " | Status: " + status + "\nMessage: " + message + "\nResponse: " + response + "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
+            });
+            PaginationUtil.paginate(ticket_details);
+        }
+    }
+
+    void createTicketSection(User loggedInUser) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(CliFormatter.boldGreen("Enter ticket description: "));
+        String description = scanner.nextLine();
+        System.out.println(CliFormatter.boldBlue("Choose ticket subject:"));
+        System.out.println("1. Report Issue");
+        System.out.println("2. User Settings (+Username)");
+        System.out.println("3. Profile Issue");
+        System.out.println("4. Other");
+        System.out.print(CliFormatter.magenta("Choose an option: "));
+
+        int subjectChoice = scanner.nextInt();
+        scanner.nextLine();
+        String username = null;
+
+        if (subjectChoice == 2) {
+            System.out.println(CliFormatter.boldBlue("Please provide username for report:"));
+
+            try {
+                username = scanner.nextLine();
+                User user = userService.searchUserByUsername(username);
+                if (user == null) {
+                    throw new NotExistingUserException(CliFormatter.boldRed("User not found"));
+                }
+            } catch (Exception e) {
+                System.out.println(CliFormatter.boldRed("User not found"));
+            }
+
+        }
+        TicketSubject subject = TicketSubject.values()[subjectChoice - 1];
+        Ticket ticket = ticketService.createTicket(description, subject, loggedInUser.getUsername());
+        if (subjectChoice == 2){
+            ticket.setReportUsername(username);
+        }
+        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Creating Ticket..."));
+        System.out.println("Ticket created successfully. Ticket ID: " + CliFormatter.boldBlue("#" + ticket.getId()));
+    }
+
+    void responseTicketSection(User loggedInUser) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Ticket ID to respond: ");
+        long ticketId = scanner.nextLong();
+        scanner.nextLine();
+        Ticket ticketToRespond = ticketRepository.findById(ticketId);
+        if (ticketToRespond != null) {
+            if (ticketToRespond.getUsername().equals(loggedInUser.getUsername()) || loggedInUser.getRole() == Role.SUPPORT) {
+                System.out.print("Enter response: ");
+                String response = scanner.nextLine();
+                ticketService.respondToTicket(ticketToRespond, response);
+                System.out.println("Response added successfully.");
+            }
+        } else {
+            System.out.println("Ticket not found or invalid.");
+        }
+    }
+
 }

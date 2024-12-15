@@ -31,7 +31,7 @@ public class PostService {
 
         CliFormatter.printTypingEffect("Checking your post for violations...");
         if (BlacklistUtil.containsBlacklistedWord(content) || ContentModerationUtil.containsHarmfulContent(content)) {
-            CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
+            CliFormatter.printTypingEffect("⚠️ Post rejected: Content Moderation rejected the post");
             return;
         }
 
@@ -167,7 +167,7 @@ public class PostService {
 
         CliFormatter.printTypingEffect("Checking your post for violations...");
         if (BlacklistUtil.containsBlacklistedWord(content) || ContentModerationUtil.containsHarmfulContent(content)) {
-            CliFormatter.printTypingEffect("⚠️ Post rejected: contains blacklisted words.");
+            CliFormatter.printTypingEffect("⚠️ Post rejected: Content Moderation rejected the post");
             return;
         }
 

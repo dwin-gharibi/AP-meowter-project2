@@ -58,14 +58,10 @@ public class MenuHandler {
     public void displayUserMenu(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println(CliFormatter.bold("User Menu:"));
-            System.out.println(CliFormatter.boldYellow("0. Home"));
-            System.out.println(CliFormatter.boldYellow("1. Settings"));
-            System.out.println(CliFormatter.boldRed("2. Support Section"));
-            System.out.println(CliFormatter.green("3. Users Section"));
-            System.out.println(CliFormatter.magenta("4. Posts Section"));
-            System.out.println(CliFormatter.cyan("5. User Profile"));
-            System.out.println(CliFormatter.red("6. Log out"));
+            System.out.println(CliFormatter.bold("User Menu:") + "\n" + CliFormatter.boldYellow("0. Home"));
+            System.out.println(CliFormatter.boldYellow("1. Settings") + "\n" + CliFormatter.boldRed("2. Support Section"));
+            System.out.println(CliFormatter.green("3. Users Section") + "\n" + CliFormatter.magenta("4. Posts Section"));
+            System.out.println(CliFormatter.cyan("5. User Profile") + "\n" + CliFormatter.red("6. Log out"));
             System.out.println(CliFormatter.blue("7. Exit"));
 
             System.out.print("Choose an option: ");
@@ -103,8 +99,7 @@ public class MenuHandler {
                     default:
                         throw new InvalidCommandException("Invalid option! Please try again.");
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println(CliFormatter.boldRed(e.getMessage()));
             }
         }
@@ -116,12 +111,7 @@ public class MenuHandler {
         LocalDateTime end_date = null;
 
         while (true) {
-            System.out.println(CliFormatter.boldYellow("Home Menu:"));
-            System.out.println(CliFormatter.boldGreen("1. Subscribe to publisher"));
-            System.out.println(CliFormatter.boldBlue("2. View followings posts "));
-            System.out.println(CliFormatter.boldRed("3. Change date filter"));
-            System.out.println(CliFormatter.boldPurple("4. Go Back"));
-
+            showHomeMenu();
 
             System.out.print(CliFormatter.green("Choose an option: "));
             int choice = scanner.nextInt();
@@ -129,100 +119,17 @@ public class MenuHandler {
 
             switch (choice) {
                 case 1:
-                    CliFormatter.progressBar(CliFormatter.boldYellow("Subscribing to posts ..."), 10);
-                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
-                    postService.subscribeToPosts();
+                    subscribeToPublisher();
                     break;
 
                 case 2:
-                    List<Post> posts = postService.getPostsFromFollowings(loggedInUser);
-                    CliFormatter.progressBar(CliFormatter.boldGreen("Loading the post ..."), 10);
+                    viewFollowingsPosts(loggedInUser, scanner, start_date, end_date);
+                    break;
 
-                    if (posts.isEmpty()) {
-                        System.out.println(CliFormatter.boldRed("No posts founded!"));
-                        break;
-                    }
-
-                    Date start_date_new = Date.from(start_date.atZone(ZoneId.systemDefault()).toInstant());
-                    Date end_date_new = Date.from(end_date.atZone(ZoneId.systemDefault()).toInstant());
-
-
-                    for (Post selectedPost : posts) {
-
-                        if (start_date_new != null && selectedPost.getCreatedAt().before(start_date_new)) {
-                            continue;
-                        }
-
-                        if (end_date_new != null && selectedPost.getCreatedAt().after(end_date_new)) {
-                            continue;
-                        }
-
-                        try {
-                            String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(selectedPost.getId())) + "\n" +
-                                    "Content: " + CliFormatter.boldGreen(selectedPost.getContent()) + "\n" +
-                                    "Created At: " + CliFormatter.boldBlue(selectedPost.getCreatedAt().toString()) + "\n" +
-                                    "Likes: " + CliFormatter.yellow(String.valueOf(selectedPost.getLikes().size())) + "\n" +
-                                    "Hashtags: " + (selectedPost.getHashtags().isEmpty()
-                                    ? CliFormatter.red("No hashtags")
-                                    : CliFormatter.cyan(selectedPost.getHashtags().toString())) + "\n" +
-                                    "Comments:\n";
-
-                            if (!selectedPost.getComments().isEmpty()) {
-                                StringBuilder commentsDetails = new StringBuilder();
-                                selectedPost.getComments().forEach(comment -> {
-                                    commentsDetails.append("    - Comment by ")
-                                            .append(CliFormatter.blue(comment.getUser().getUsername()))
-                                            .append(": ")
-                                            .append(CliFormatter.cyan(comment.getContent()))
-                                            .append("\n");
-                                });
-                                postDetail += commentsDetails.toString();
-                            } else {
-                                postDetail += CliFormatter.red("    No comments yet.\n");
-                            }
-
-                            System.out.println(postDetail);
-                        } catch (Exception e){
-                            System.out.println(CliFormatter.boldRed("Something went wrong"));
-                            return;
-                        }
-                    }
-
-
-
-                    while (true) {
-                        System.out.println(CliFormatter.boldYellow("1. Handle Requests (L[id], C[id], #[hashtag])"));
-                        System.out.println(CliFormatter.boldPurple("2. Back to Main Menu"));
-                        System.out.print(CliFormatter.magenta("Choose an option: "));
-                        int choice_request = scanner.nextInt();
-                        scanner.nextLine();
-
-                        switch (choice_request) {
-                            case 1:
-                                postController.handleRequests(loggedInUser, scanner);
-                                break;
-                            case 2:
-                                break;
-                            default:
-                                System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
-                                break;
-                        }
-                    }
                 case 3:
-                    System.out.print("Enter date filters: (YYYY-mm-dd|YYYY-mm-dd) \nNote: They can also be empty for open ranges.\n");
-                    String dateStr = scanner.nextLine();
-
-                    if (!dateStr.contains("|")){
-                        System.out.print(CliFormatter.boldRed("False Date format."));
-                    }
-
-                    String start = dateStr.split("\\|")[0];
-                    System.out.println(start);
-                    String end = dateStr.split("\\|")[1];
-                    System.out.println(end);
-                    start_date = DateConverter.convertStringToDate(start.trim());
-                    end_date = DateConverter.convertStringToDate(end.trim());
-                    CliFormatter.progressBar(CliFormatter.boldYellow("Setting date filters ..."), 5);
+                    LocalDateTime[] dates = setDateFilter(scanner);
+                    start_date = dates[0];
+                    end_date = dates[1];
                     break;
 
                 case 4:
@@ -233,6 +140,110 @@ public class MenuHandler {
             }
         }
     }
+
+    private void showHomeMenu() {
+        System.out.println(CliFormatter.boldYellow("Home Menu:"));
+        System.out.println(CliFormatter.boldGreen("1. Subscribe to publisher"));
+        System.out.println(CliFormatter.boldBlue("2. View followings posts"));
+        System.out.println(CliFormatter.boldRed("3. Change date filter"));
+        System.out.println(CliFormatter.boldPurple("4. Go Back"));
+    }
+
+    private void subscribeToPublisher() {
+        CliFormatter.progressBar(CliFormatter.boldYellow("Subscribing to posts ..."), 10);
+        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
+        postService.subscribeToPosts();
+    }
+
+    private void viewFollowingsPosts(User loggedInUser, Scanner scanner, LocalDateTime start_date, LocalDateTime end_date) {
+        List<Post> posts = postService.getPostsFromFollowings(loggedInUser);
+        CliFormatter.progressBar(CliFormatter.boldGreen("Loading the posts ..."), 10);
+
+        if (posts.isEmpty()) {
+            System.out.println(CliFormatter.boldRed("No posts found!"));
+            return;
+        }
+
+        Date start_date_new = start_date != null ? Date.from(start_date.atZone(ZoneId.systemDefault()).toInstant()) : null;
+        Date end_date_new = end_date != null ? Date.from(end_date.atZone(ZoneId.systemDefault()).toInstant()) : null;
+
+        posts.stream()
+                .filter(post -> (start_date_new == null || !post.getCreatedAt().before(start_date_new)) &&
+                        (end_date_new == null || !post.getCreatedAt().after(end_date_new)))
+                .forEach(this::displayPost);
+
+        handlePostRequests(loggedInUser, scanner);
+    }
+
+    private void displayPost(Post selectedPost) {
+        try {
+            String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(selectedPost.getId())) + "\n" +
+                    "Content: " + CliFormatter.boldGreen(selectedPost.getContent()) + "\n" +
+                    "Created At: " + CliFormatter.boldBlue(selectedPost.getCreatedAt().toString()) + "\n" +
+                    "Likes: " + CliFormatter.yellow(String.valueOf(selectedPost.getLikes().size())) + "\n" +
+                    "Hashtags: " + (selectedPost.getHashtags().isEmpty() ? CliFormatter.red("No hashtags") : CliFormatter.cyan(selectedPost.getHashtags().toString())) + "\n" +
+                    "Comments:\n";
+
+            if (!selectedPost.getComments().isEmpty()) {
+                StringBuilder commentsDetails = new StringBuilder();
+                selectedPost.getComments().forEach(comment -> {
+                    commentsDetails.append("    - Comment by ")
+                            .append(CliFormatter.blue(comment.getUser().getUsername()))
+                            .append(": ")
+                            .append(CliFormatter.cyan(comment.getContent()))
+                            .append("\n");
+                });
+                postDetail += commentsDetails.toString();
+            } else {
+                postDetail += CliFormatter.red("    No comments yet.\n");
+            }
+
+            System.out.println(postDetail);
+        } catch (Exception e) {
+            System.out.println(CliFormatter.boldRed("Something went wrong"));
+        }
+    }
+
+    private void handlePostRequests(User loggedInUser, Scanner scanner) {
+        while (true) {
+            System.out.println(CliFormatter.boldYellow("1. Handle Requests (L[id], C[id], #[hashtag])"));
+            System.out.println(CliFormatter.boldPurple("2. Back to Main Menu"));
+            System.out.print(CliFormatter.magenta("Choose an option: "));
+            int choice_request = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice_request) {
+                case 1:
+                    postController.handleRequests(loggedInUser, scanner);
+                    break;
+                case 2:
+                    return;
+                default:
+                    System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
+            }
+        }
+    }
+
+    private LocalDateTime[] setDateFilter(Scanner scanner) {
+        System.out.print("Enter date filters: (YYYY-mm-dd|YYYY-mm-dd) \nNote: They can also be empty for open ranges.\n");
+        String dateStr = scanner.nextLine();
+
+        if (!dateStr.contains("|")) {
+            System.out.println(CliFormatter.boldRed("Invalid date format."));
+            return new LocalDateTime[]{null, null};
+        }
+
+        String start = dateStr.split("\\|")[0].trim();
+        String end = dateStr.split("\\|")[1].trim();
+
+        LocalDateTime start_date = start.isEmpty() ? null : DateConverter.convertStringToDate(start);
+        LocalDateTime end_date = end.isEmpty() ? null : DateConverter.convertStringToDate(end);
+
+        CliFormatter.progressBar(CliFormatter.boldYellow("Setting date filters ..."), 5);
+
+        return new LocalDateTime[]{start_date, end_date};
+    }
+
 
     public void displaySettings(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);

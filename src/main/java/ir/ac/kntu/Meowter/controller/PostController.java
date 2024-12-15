@@ -159,37 +159,42 @@ public class PostController {
                 System.out.println(CliFormatter.boldRed("Something went wrong"));
                 return;
             }
-
-            System.out.println(CliFormatter.boldBlue("1. Edit post"));
-            System.out.println(CliFormatter.boldGreen("2. Delete post"));
-            System.out.println(CliFormatter.boldBlue("3. Likes Details"));
-            System.out.println(CliFormatter.boldYellow("4. Comments Details"));
-            System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
-            System.out.print(CliFormatter.magenta("Choose an option: "));
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    editPost(loggedInUser, selectedPost);
-                    break;
-                case 2:
-                    deletePost(loggedInUser, selectedPost);
-                    break;
-                case 3:
-                    likeDetails(selectedPost);
-                    break;
-                case 4:
-                    commentsDetails(loggedInUser, selectedPost);
-                    break;
-                case 5:
-                    return;
-                default:
-                    System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
-                    break;
-            }
+            displayPostDetails(loggedInUser, selectedPost);
         }
     }
+
+    private void displayPostDetails(User loggedInUser, Post selectedPost) {
+        System.out.println(CliFormatter.boldBlue("1. Edit post"));
+        System.out.println(CliFormatter.boldGreen("2. Delete post"));
+        System.out.println(CliFormatter.boldBlue("3. Likes Details"));
+        System.out.println(CliFormatter.boldYellow("4. Comments Details"));
+        System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
+        System.out.print(CliFormatter.magenta("Choose an option: "));
+        Scanner scanner = new Scanner(System.in);
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                editPost(loggedInUser, selectedPost);
+                break;
+            case 2:
+                deletePost(loggedInUser, selectedPost);
+                break;
+            case 3:
+                likeDetails(selectedPost);
+                break;
+            case 4:
+                commentsDetails(loggedInUser, selectedPost);
+                break;
+            case 5:
+                return;
+            default:
+                System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
+                break;
+        }
+    }
+
 
     private void likeDetails(Post selectedPost) {
         CliFormatter.progressBar(CliFormatter.boldGreen("Getting like details..."), 10);

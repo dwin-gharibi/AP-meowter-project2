@@ -22,7 +22,9 @@ public class UserRepository {
             session.saveOrUpdate(user);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -139,7 +141,9 @@ public class UserRepository {
             session.saveOrUpdate(followRequest);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -194,7 +198,9 @@ public class UserRepository {
             session.merge(followRequest);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();

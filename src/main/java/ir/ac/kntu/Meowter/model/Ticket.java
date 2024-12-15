@@ -56,16 +56,18 @@ public class Ticket {
     public void setReportUsername(String reportUsername) {
         this.reportUsername = reportUsername;
     }
+
     public String getReportUsername() {
         return reportUsername;
     }
+
     public void setReportWarning(String reportWarning) {
         this.reportWarning = reportWarning;
     }
+
     public String getReportWarning() {
         return reportWarning;
     }
-
 
     public Long getId() {
         return id;

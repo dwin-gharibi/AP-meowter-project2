@@ -22,7 +22,9 @@ public class PostRepository {
             session.save(post);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
         } finally {
             session.close();
         }
@@ -37,7 +39,9 @@ public class PostRepository {
             session.update(post);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
         } finally {
             session.close();
         }
@@ -55,7 +59,9 @@ public class PostRepository {
             }
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -152,7 +158,9 @@ public class PostRepository {
             session.update(post);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -171,7 +179,9 @@ public class PostRepository {
             session.update(post);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -194,7 +204,9 @@ public class PostRepository {
                 System.out.println("Comment not found or user is not authorized to delete.");
             }
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
@@ -220,7 +232,9 @@ public class PostRepository {
                 System.out.println("Like not found.");
             }
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();

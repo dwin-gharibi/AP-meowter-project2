@@ -18,7 +18,7 @@ public class RedisHashtagUtil {
         AtomicInteger cnt = new AtomicInteger();
         try (Jedis jedis = new Jedis("localhost", 6379)) {
             jedis.zrevrangeWithScores(TOP_HASHTAGS_KEY, 0, n - 1).forEach(entry -> {
-                System.out.printf(CliFormatter.boldRed("#%s (%d occurrences)\n"), entry.getElement(), Math.round(entry.getScore()));
+                System.out.printf(CliFormatter.boldRed("%s (%d times)\n"), entry.getElement(), Math.round(entry.getScore()));
                 cnt.getAndIncrement();
             });
             if (cnt.get() == 0) {

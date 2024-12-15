@@ -110,7 +110,9 @@ public class Main {
                         String password = scanner.nextLine();
 
                         loggedInUser = attemptLogin(userService, username, password, role);
-                        if (loggedInUser == null) continue;
+                        if (loggedInUser == null) {
+                            continue;
+                        }
                     } else {
                         CliFormatter.printTypingEffect("Turning back to main menu...");
                         continue;
@@ -130,7 +132,9 @@ public class Main {
                         String password = scanner.nextLine();
 
                         loggedInUser = attemptLogin(userService, username, password, Role.USER);
-                        if (loggedInUser == null) continue;
+                        if (loggedInUser == null) {
+                            continue;
+                        }
                     } else if (choice == 2) {
                         System.out.println(CliFormatter.boldBlue("⚠️ Registration Requirements:"));
                         System.out.println(CliFormatter.bold("Please ensure the following before registering:"));

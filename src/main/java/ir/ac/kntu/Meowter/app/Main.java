@@ -6,12 +6,16 @@ import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
 import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.DateConverter;
+
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
+
+//        DateConverter.convertStringToDate("2020-02-01");
 
 
 //        CliFormatter.progressBar("this is a sample text", 100);

@@ -5,6 +5,7 @@ import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.PostRepository;
 import ir.ac.kntu.Meowter.repository.UserRepository;
 import ir.ac.kntu.Meowter.util.*;
+import org.hibernate.Session;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.List;
@@ -50,6 +51,22 @@ public class PostService {
                 System.out.println("New post received: " + message);
             }
         });
+    }
+
+    public List<Post> getPostsFromFollowings(User user) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Post> posts = null;
+
+        try {
+            String hql = "FROM Post p WHERE p.user IN :followings ORDER BY p.createdAt DESC";
+            posts = session.createQuery(hql, Post.class)
+                    .setParameter("followings", user.getFollowing())
+                    .getResultList();
+        } finally {
+            session.close();
+        }
+
+        return posts;
     }
 
     public void viewAllPosts(int page, int size) {

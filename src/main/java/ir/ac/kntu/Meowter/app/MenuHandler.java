@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.app;
 
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
+import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.PostService;
@@ -12,7 +13,10 @@ import ir.ac.kntu.Meowter.controller.PostController;
 import ir.ac.kntu.Meowter.controller.SupportController;
 import ir.ac.kntu.Meowter.controller.TicketController;
 import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.DateConverter;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuHandler {
@@ -69,8 +73,6 @@ public class MenuHandler {
             try{
                 switch (choice) {
                     case 0:
-//                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
-//                        postService.subscribeToPosts();
                         displayHome(loggedInUser);
                         break;
                     case 1:
@@ -108,13 +110,19 @@ public class MenuHandler {
 
     public void displayHome(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
+        LocalDateTime start_date = null;
+        LocalDateTime end_date = null;
 
         while (true) {
             System.out.println(CliFormatter.boldYellow("Home Menu:"));
             System.out.println(CliFormatter.boldGreen("1. Subscribe to publisher"));
-            System.out.println(CliFormatter.boldBlue("2. View following posts "));
+            System.out.println(CliFormatter.boldBlue("2. View followings posts "));
             System.out.println(CliFormatter.boldRed("3. Change date filter"));
-            System.out.println(CliFormatter.boldRed("4. Go Back"));
+            System.out.println(CliFormatter.boldPurple("4. Go Back"));
+
+
+            System.out.println(start_date);
+            System.out.println(end_date);
 
             System.out.print(CliFormatter.green("Choose an option: "));
             int choice = scanner.nextInt();
@@ -122,25 +130,33 @@ public class MenuHandler {
 
             switch (choice) {
                 case 1:
-                    System.out.print("Enter new username: ");
-                    String newUsername = scanner.nextLine();
-                    loggedInUser = userService.updateUsername(loggedInUser, newUsername);
-                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Username updated successfully."));
+                    CliFormatter.progressBar(CliFormatter.boldYellow("Subscribing to posts ..."), 10);
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
+                    postService.subscribeToPosts();
                     break;
 
                 case 2:
-                    System.out.print("Enter new password: ");
-                    String newPassword = scanner.nextLine();
-                    loggedInUser = userService.updatePassword(loggedInUser, newPassword);
-                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Password updated successfully."));
+                    List<Post> posts = postService.getPostsFromFollowings(loggedInUser);
+                    for (Post post : posts) {
+                        System.out.println(post.getContent());
+                    }
                     break;
 
                 case 3:
-                    System.out.print("Make your profile private? (true/false): ");
-                    boolean isPrivate = scanner.nextBoolean();
-                    scanner.nextLine();
-                    loggedInUser = userService.updatePrivacySetting(loggedInUser, isPrivate);
-                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Privacy setting updated successfully."));
+                    System.out.print("Enter date filters: (YYYY-mm-dd|YYYY-mm-dd) \nNote: They can also be empty for open ranges.\n");
+                    String dateStr = scanner.nextLine();
+
+                    if (!dateStr.contains("|")){
+                        System.out.print(CliFormatter.boldRed("False Date format."));
+                    }
+
+                    String start = dateStr.split("\\|")[0];
+                    System.out.println(start);
+                    String end = dateStr.split("\\|")[1];
+                    System.out.println(end);
+                    start_date = DateConverter.convertStringToDate(start.trim());
+                    end_date = DateConverter.convertStringToDate(end.trim());
+                    CliFormatter.progressBar(CliFormatter.boldYellow("Setting date filters ..."), 5);
                     break;
 
                 case 4:

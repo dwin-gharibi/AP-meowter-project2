@@ -69,8 +69,9 @@ public class MenuHandler {
             try{
                 switch (choice) {
                     case 0:
-                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
-                        postService.subscribeToPosts();
+//                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("Listening for posts..."));
+//                        postService.subscribeToPosts();
+                        displayHome(loggedInUser);
                         break;
                     case 1:
                         displaySettings(loggedInUser);
@@ -101,6 +102,52 @@ public class MenuHandler {
             }
             catch (Exception e) {
                 System.out.println(CliFormatter.boldRed(e.getMessage()));
+            }
+        }
+    }
+
+    public void displayHome(User loggedInUser) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println(CliFormatter.boldYellow("Home Menu:"));
+            System.out.println(CliFormatter.boldGreen("1. Subscribe to publisher"));
+            System.out.println(CliFormatter.boldBlue("2. View following posts "));
+            System.out.println(CliFormatter.boldRed("3. Change date filter"));
+            System.out.println(CliFormatter.boldRed("4. Go Back"));
+
+            System.out.print(CliFormatter.green("Choose an option: "));
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter new username: ");
+                    String newUsername = scanner.nextLine();
+                    loggedInUser = userService.updateUsername(loggedInUser, newUsername);
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Username updated successfully."));
+                    break;
+
+                case 2:
+                    System.out.print("Enter new password: ");
+                    String newPassword = scanner.nextLine();
+                    loggedInUser = userService.updatePassword(loggedInUser, newPassword);
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Password updated successfully."));
+                    break;
+
+                case 3:
+                    System.out.print("Make your profile private? (true/false): ");
+                    boolean isPrivate = scanner.nextBoolean();
+                    scanner.nextLine();
+                    loggedInUser = userService.updatePrivacySetting(loggedInUser, isPrivate);
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Privacy setting updated successfully."));
+                    break;
+
+                case 4:
+                    return;
+
+                default:
+                    System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
             }
         }
     }

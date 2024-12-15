@@ -1,6 +1,5 @@
 package ir.ac.kntu.Meowter.controller;
 
-import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.service.PostService;
 import ir.ac.kntu.Meowter.service.UserService;
@@ -8,12 +7,12 @@ import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.PaginationUtil;
-import java.util.*;
 import ir.ac.kntu.Meowter.util.DateConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class UserController {
 
@@ -133,17 +132,15 @@ public class UserController {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Users Section");
-            System.out.println("1. View All Users");
-            System.out.println("2. View Followers");
-            System.out.println("3. View Followings");
-            System.out.println("4. Search Users");
-            System.out.println("5. Send Follow Request");
-            System.out.println("6. View Follow Requests (Received & Sent)");
-            System.out.println("7. Remove Follower");
-            System.out.println("8. Unfollow User");
-            System.out.println("9. Back to Main Menu");
-            System.out.print("Choose an option: ");
+            CliFormatter.printTypingEffect(CliFormatter.boldYellow("Welcome to users section:"));
+            System.out.println(CliFormatter.boldGreen("    - You can also type #username to immediately send follow request."));
+            System.out.println(CliFormatter.boldPurple("1. View Followers"));
+            System.out.println(CliFormatter.boldGreen("2. View Followings"));
+            System.out.println(CliFormatter.boldBlue("3. Search Users"));
+
+            System.out.println(CliFormatter.boldYellow("4. View Follow Requests (Received & Sent)"));
+            System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
+            System.out.print(CliFormatter.cyan("Choose an option: "));
 
             String input = scanner.nextLine();
 
@@ -151,10 +148,10 @@ public class UserController {
                 String targetUsername = input.substring(1);
                 User recipientUser = userService.searchUserByUsername(targetUsername);
                 if (recipientUser != null) {
+                    CliFormatter.progressBar(CliFormatter.boldBlue("Sending follow request..."), 5);
                     userService.sendFollowRequest(loggedInUser, recipientUser);
-                    System.out.println("Follow request sent to @" + recipientUser.getUsername());
                 } else {
-                    System.out.println("User not found.");
+                    System.out.println(CliFormatter.boldRed("User not found."));
                 }
                 continue;
             }
@@ -163,28 +160,99 @@ public class UserController {
             try {
                 choice = Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid option. Please try again.");
+                System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
                 continue;
             }
 
             switch (choice) {
                 case 1:
-                    userService.getAllUsers().forEach(user -> {
-                        System.out.println("Username: @" + user.getUsername() + " | Email: " + user.getEmail());
-                        System.out.println("Type #username to follow @" + user.getUsername());
-                    });
+
+                    Set<User> followers = loggedInUser.getFollowers();
+                    StringBuilder followers_details = new StringBuilder();
+
+                    if (!followers.isEmpty()) {
+                        followers_details.append(CliFormatter.bold("\n Followers:\n"));
+                        List<String> follower_details = new ArrayList<>();
+
+                        followers.forEach(follower -> {
+                            String UserDetail = "Username: @" + CliFormatter.blue(follower.getUsername()) + "\n";
+
+                            follower_details.add(UserDetail);
+                        });
+
+                        PaginationUtil.paginate(follower_details);
+                    } else {
+                        System.out.println(CliFormatter.red("\nNo followers founded.\n"));
+                         break;
+                    }
+
+
+                    while (true) {
+                        System.out.println(CliFormatter.green("You can select a user by typing @username or back:"));
+
+                        System.out.print(CliFormatter.cyan("Choose an option: "));
+                        String choice_user = scanner.nextLine();
+
+                        if (choice_user.startsWith("@")) {
+                            String targetUsername = choice_user.substring(1);
+                            User recipientUser = userService.searchUserByUsername(targetUsername);
+                            if (recipientUser != null) {
+                                displayUserProfile(loggedInUser, recipientUser);
+                            } else {
+                                System.out.println(CliFormatter.boldRed("User not found."));
+                            }
+                        } else {
+                            break;
+                        }
+
+
+                    }
+
                     break;
 
                 case 2:
-                    loggedInUser.getFollowers().forEach(follower -> {
-                        System.out.println("Follower: @" + follower.getUsername());
-                    });
-                    break;
 
-                case 3:
-                    loggedInUser.getFollowing().forEach(following -> {
-                        System.out.println("Following: @" + following.getUsername());
-                    });
+                    Set<User> followings = loggedInUser.getFollowing();
+                    StringBuilder followings_details = new StringBuilder();
+
+                    if (!followings.isEmpty()) {
+                        followings_details.append(CliFormatter.bold("\n Followings:\n"));
+                        List<String> following_details = new ArrayList<>();
+
+                        followings.forEach(following -> {
+                            String UserDetail = "Username: @" + CliFormatter.blue(following.getUsername()) + "\n";
+
+                            following_details.add(UserDetail);
+                        });
+
+                        PaginationUtil.paginate(following_details);
+                    } else {
+                        System.out.println(CliFormatter.red("\nNo followings founded.\n"));
+                        break;
+                    }
+
+
+                    while (true) {
+                        System.out.println(CliFormatter.green("You can select a user by typing @username or back:"));
+
+                        System.out.print(CliFormatter.cyan("Choose an option: "));
+                        String choice_user = scanner.nextLine();
+
+                        if (choice_user.startsWith("@")) {
+                            String targetUsername = choice_user.substring(1);
+                            User recipientUser = userService.searchUserByUsername(targetUsername);
+                            if (recipientUser != null) {
+                                displayUserProfile(loggedInUser, recipientUser);
+                            } else {
+                                System.out.println(CliFormatter.boldRed("User not found."));
+                            }
+                        } else {
+                            break;
+                        }
+
+
+                    }
+
                     break;
 
                 case 4:
@@ -204,13 +272,7 @@ public class UserController {
                 case 5:
                     System.out.print("Enter #username to follow: ");
                     String targetUser = scanner.nextLine().substring(1);
-                    User recipient = userService.searchUserByUsername(targetUser);
-                    if (recipient != null) {
-                        userService.sendFollowRequest(loggedInUser, recipient);
-                        System.out.println("Follow request sent to @" + recipient.getUsername());
-                    } else {
-                        System.out.println("User not found.");
-                    }
+
                     break;
 
                 case 6:
@@ -241,24 +303,14 @@ public class UserController {
 
                 case 7:
                     System.out.print("Enter the username of the follower to remove: ");
-                    String followerUsername = scanner.nextLine();
-                    User follower = userService.searchUserByUsername(followerUsername);
-                    if (follower != null) {
-                        userService.removeFollower(loggedInUser, follower);
-                    } else {
-                        System.out.println("Follower not found.");
-                    }
+
                     break;
 
                 case 8:
                     System.out.print("Enter the username of the user to unfollow: ");
                     String unfollowUsername = scanner.nextLine();
                     User unfollowUser = userService.searchUserByUsername(unfollowUsername);
-                    if (unfollowUser != null) {
-                        userService.unfollowUser(loggedInUser, unfollowUser);
-                    } else {
-                        System.out.println("User not found.");
-                    }
+
                     break;
 
                 case 9:
@@ -270,6 +322,124 @@ public class UserController {
             }
         }
     }
+
+
+    public void displayUserProfile(User loggedInUser, User selectedUser) {
+        CliFormatter.loadingSpinner(CliFormatter.boldGreen("Getting user information and profile..."));
+
+        StringBuilder profileDetails = new StringBuilder();
+
+        profileDetails.append(CliFormatter.bold("👤 Username: ")).append(selectedUser.getUsername()).append("\n");
+        profileDetails.append(CliFormatter.bold("📧 Email: ")).append(selectedUser.getEmail()).append("\n");
+        profileDetails.append(CliFormatter.bold("📝 Bio: ")).append(selectedUser.getBio() == null ? CliFormatter.boldRed("No bio provided.") : selectedUser.getBio()).append("\n");
+        profileDetails.append(CliFormatter.bold("🎂 Date of Birth: ")).append(selectedUser.getDateofbirth() != null ? selectedUser.getDateofbirth().toLocalDate().toString() : CliFormatter.boldRed("Not provided")).append("\n");
+
+        profileDetails.append(CliFormatter.bold("🔒 Private Profile: ")).append(selectedUser.getIsPrivate() ? CliFormatter.boldGreen("Yes") : CliFormatter.boldRed("No")).append("\n");
+
+        profileDetails.append(CliFormatter.bold("👥 Followers: ")).append(selectedUser.getFollowers().size()).append("\n");
+        profileDetails.append(CliFormatter.bold("👣 Following: ")).append(selectedUser.getFollowing().size()).append("\n");
+
+        profileDetails.append(CliFormatter.bold("🛠️ Role: ")).append(selectedUser.getRole()).append("\n");
+
+        profileDetails.append(CliFormatter.bold("✅ Active: ")).append(selectedUser.isActive() ? CliFormatter.boldGreen("Yes") : CliFormatter.boldRed("No")).append("\n");
+
+        System.out.println(profileDetails.toString());
+
+        List<Post> posts = postService.getUserPosts(selectedUser);
+
+        if (selectedUser.getIsPrivate()) {
+            System.out.println(CliFormatter.boldRed("This profile is private. Follow to see posts."));
+        } else {
+            if (!posts.isEmpty()) {
+                profileDetails.append(CliFormatter.bold("\n📸 Posts:\n"));
+                List<String> post_details = new ArrayList<>();
+
+                posts.forEach(post -> {
+                    String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(post.getId())) + "\n" +
+                            "Content: " + CliFormatter.boldGreen(post.getContent()) + "\n" +
+                            "Created At: " + CliFormatter.boldBlue(post.getCreatedAt().toString()) + "\n" +
+                            "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" +
+                            "Hashtags: " + (post.getHashtags().isEmpty()
+                            ? CliFormatter.red("No hashtags")
+                            : CliFormatter.cyan(post.getHashtags().toString())) + "\n" +
+                            "Comments:\n";
+
+                    if (!post.getComments().isEmpty()) {
+                        StringBuilder commentsDetails = new StringBuilder();
+                        post.getComments().forEach(comment -> {
+                            commentsDetails.append("    - Comment by ")
+                                    .append(CliFormatter.blue(comment.getUser().getUsername()))
+                                    .append(": ")
+                                    .append(CliFormatter.cyan(comment.getContent()))
+                                    .append("\n");
+                        });
+                        postDetail += commentsDetails.toString();
+                    } else {
+                        postDetail += CliFormatter.red("    No comments yet.\n");
+                    }
+
+                    post_details.add(postDetail);
+                });
+
+                PaginationUtil.paginate(post_details);
+            } else {
+                System.out.println(CliFormatter.red("\n📸 Posts: No posts yet.\n"));
+            }
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            CliFormatter.printTypingEffect(CliFormatter.boldYellow("Loading user options..."));
+            System.out.println(CliFormatter.green("Options for: " + CliFormatter.boldYellow(selectedUser.getUsername())));
+            System.out.println(CliFormatter.bold("1. Send Follow Request"));
+            System.out.println(CliFormatter.boldRed("2. Remove Follower"));
+            System.out.println(CliFormatter.boldBlue("3. Unfollow User"));
+            System.out.println(CliFormatter.cyan("4. Go Back"));
+
+            System.out.print(CliFormatter.boldYellow("Choose an option: "));
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            try{
+                switch (choice) {
+                    case 1:
+                        if (selectedUser != null) {
+                            userService.sendFollowRequest(loggedInUser, selectedUser);
+                        } else {
+                            System.out.println(CliFormatter.boldRed("User not found."));
+                        }
+                        break;
+
+                    case 2:
+                        if (selectedUser != null) {
+                            userService.removeFollower(loggedInUser, selectedUser);
+                        } else {
+                            System.out.println(CliFormatter.boldRed("Follower not found."));
+                        }
+                        break;
+                    case 3:
+                        if (selectedUser != null) {
+                            userService.unfollowUser(loggedInUser, selectedUser);
+                        } else {
+                            System.out.println(CliFormatter.boldRed("User not found."));
+                        }
+                        break;
+
+                    case 4:
+                        return;
+
+                    default:
+                        System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
+
 
     private void createPost(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);

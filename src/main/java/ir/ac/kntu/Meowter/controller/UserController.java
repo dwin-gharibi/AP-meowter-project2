@@ -60,7 +60,11 @@ public class UserController {
                 if (!post.getComments().isEmpty()) {
                     StringBuilder commentsDetails = new StringBuilder();
                     post.getComments().forEach(comment -> {
-                        commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                        if (comment.getUser().isActive()) {
+                            commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                        } else {
+                            commentsDetails.append(CliFormatter.boldRed("    - Comment hidden because user is inactive ")).append("\n");
+                        }
                     });
                     postDetail += commentsDetails.toString();
                 } else {
@@ -191,8 +195,10 @@ public class UserController {
         if (!followers.isEmpty()) {
             List<String> follower_details = new ArrayList<>();
             followers.forEach(follower -> {
-                String UserDetail = "Username: @" + CliFormatter.blue(follower.getUsername()) + "\n";
-                follower_details.add(UserDetail);
+                if (follower.isActive()) {
+                    String UserDetail = "Username: @" + CliFormatter.blue(follower.getUsername()) + "\n";
+                    follower_details.add(UserDetail);
+                }
             });
             PaginationUtil.paginate(follower_details);
             selectUserFromList(loggedInUser);
@@ -206,8 +212,10 @@ public class UserController {
         if (!followings.isEmpty()) {
             List<String> following_details = new ArrayList<>();
             followings.forEach(following -> {
-                String UserDetail = "Username: @" + CliFormatter.blue(following.getUsername()) + "\n";
-                following_details.add(UserDetail);
+                if (following.isActive()) {
+                    String UserDetail = "Username: @" + CliFormatter.blue(following.getUsername()) + "\n";
+                    following_details.add(UserDetail);
+                }
             });
             PaginationUtil.paginate(following_details);
             selectUserFromList(loggedInUser);
@@ -316,7 +324,11 @@ public class UserController {
                     if (!post.getComments().isEmpty()) {
                         StringBuilder commentsDetails = new StringBuilder();
                         post.getComments().forEach(comment -> {
-                            commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                            if (comment.getUser().isActive()) {
+                                commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                            } else {
+                                commentsDetails.append(CliFormatter.boldRed("    - Comment hidden because user is inactive ")).append("\n");
+                            }
                         });
                         postDetail += commentsDetails.toString();
                     } else {
@@ -399,71 +411,4 @@ public class UserController {
         postService.viewPostsByUser(loggedInUser);
     }
 
-    public void registerSection(User loggedInUser) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(CliFormatter.boldBlue("⚠️ Registration Requirements:"));
-        System.out.println(CliFormatter.bold("Please ensure the following before registering:"));
-        System.out.println(CliFormatter.boldYellow("1. Username: ") +
-                CliFormatter.bold("Username should be unique."));
-        System.out.println(CliFormatter.boldYellow("2. Email: ") +
-                CliFormatter.bold("Must be a valid and unique email address."));
-        System.out.println(CliFormatter.boldYellow("3. Password: ") +
-                CliFormatter.bold("Must be at least 8 characters long and include:"));
-        System.out.println(CliFormatter.bold("   - ") + "One uppercase letter.");
-        System.out.println(CliFormatter.bold("   - ") + "One lowercase letter.");
-        System.out.println(CliFormatter.bold("   - ") + "One number.");
-        System.out.println(CliFormatter.bold("   - ") + "One special character (e.g., !@#$%).");
-        CliFormatter.printTypingEffect(CliFormatter.boldGreen("✔️ Ready to register? Follow the prompts below!"));
-
-        System.out.println("\n------------");
-
-        System.out.print(CliFormatter.boldPurple("Enter a username: "));
-        String username = scanner.nextLine();
-        System.out.print(CliFormatter.magenta("Enter your email: "));
-        String email = scanner.nextLine();
-        System.out.print(CliFormatter.red("Enter your password: "));
-        String password = scanner.nextLine();
-
-        try {
-            loggedInUser = userService.register(username, email, password);
-        } catch (Exception e) {
-            System.out.println(CliFormatter.boldRed(e.getMessage()));
-        }
-
-        if (loggedInUser != null) {
-            System.out.println(CliFormatter.boldGreen("Registration successful! You are now logged in."));
-            SessionManager.saveSession(loggedInUser);
-        }
-    }
-
-    public boolean menuSection(User loggedInUser, Role role) {
-        Scanner scanner = new Scanner(System.in);
-        if(!loggedInUser.isActive()){
-            System.out.println(CliFormatter.boldRed("Your account is Inactive!"));
-            System.out.println(CliFormatter.yellow("For getting more information contact with admin."));
-            CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
-            SessionManager.clearSession();
-            return true;
-        }
-
-        if (role == Role.ADMIN) {
-            AdminMenuHandler adminMenuHandler = new AdminMenuHandler();
-            adminMenuHandler.displayAdminMenu(loggedInUser);
-        } else if (role == Role.SUPPORT) {
-            SupportMenuHandler supportMenuHandler = new SupportMenuHandler();
-            supportMenuHandler.displaySupportMenu(loggedInUser);
-        } else {
-            MenuHandler menuHandler = new MenuHandler();
-            menuHandler.displayMainMenu(loggedInUser, role);
-        }
-
-        CliFormatter.printTypingEffect("Do you want to log out? (y/n): ");
-        String logoutChoice = scanner.nextLine();
-        if ("y".equalsIgnoreCase(logoutChoice)) {
-            CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
-            SessionManager.clearSession();
-            return true;
-        }
-        return false;
-    }
 }

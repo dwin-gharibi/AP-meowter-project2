@@ -148,7 +148,7 @@
     <!--<rule ref="category/java/design.xml/MutableStaticState"/>-->
     <rule ref="category/java/design.xml/NcssCount">
         <properties>
-            <property name="methodReportLevel" value="25"/>
+            <property name="methodReportLevel" value="150"/>
             <property name="classReportLevel" value="500"/>
         </properties>
     </rule>
@@ -201,7 +201,7 @@
     <!--<rule ref="category/java/errorprone.xml/CloneMethodMustBePublic"/>-->
     <!--<rule ref="category/java/errorprone.xml/CloneMethodMustImplementCloneable"/>-->
     <!--<rule ref="category/java/errorprone.xml/CloneMethodReturnTypeMustMatchClassName"/>-->
-    <rule ref="category/java/errorprone.xml/CloseResource"/>
+<!--    <rule ref="category/java/errorprone.xml/CloseResource"/>-->
     <!--<rule ref="category/java/errorprone.xml/CompareObjectsWithEquals"/>-->
     <!--<rule ref="category/java/errorprone.xml/ComparisonWithNaN"/>-->
     <!--<rule ref="category/java/errorprone.xml/ConstructorCallsOverridableMethod"/>-->

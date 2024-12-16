@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import ir.ac.kntu.Meowter.exceptions.NotExistingUserException;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.repository.TicketRepository;
+import ir.ac.kntu.Meowter.repository.UserRepository;
 import ir.ac.kntu.Meowter.service.TicketService;
 import ir.ac.kntu.Meowter.model.Ticket;
 import ir.ac.kntu.Meowter.model.TicketSubject;
@@ -22,11 +23,13 @@ public class TicketController {
     private TicketService ticketService;
     private final TicketRepository ticketRepository;
     private UserService userService;
+    private UserRepository userRepository;
 
     public TicketController() {
         this.ticketService = new TicketService();
         this.ticketRepository = new TicketRepository();
         this.userService = new UserService();
+        this.userRepository = new UserRepository();
     }
 
     public void displayTicketSection(User loggedInUser) {
@@ -45,7 +48,9 @@ public class TicketController {
                     Ticket ticketToBan = ticketRepository.findById(ticketIdBan);
                     if (ticketToBan != null) {
                         User user = userService.searchUserByUsername(ticketToBan.getUsername());
+                        System.out.println(user.getUsername());
                         user.setActive(false);
+                        userRepository.update(user);
                         System.out.println(CliFormatter.boldRed("User of this ticket get InActivated!"));
                     } else {
                         System.out.println(CliFormatter.boldRed("Ticket not found or invalid."));
@@ -114,13 +119,14 @@ public class TicketController {
         if (loggedInUser.getRole() == Role.SUPPORT) {
             ticketService.getAllTickets().forEach(t -> {
                 String message = CliFormatter.boldYellow(t.getDescription());
+                String ticketUserSend = CliFormatter.boldBlue("@" + t.getUsername());
                 String response = t.getResponse() == null ? CliFormatter.red("No Response Available") : CliFormatter.boldGreen(t.getResponse());
                 String ticketIdOut = CliFormatter.blue("#" + String.valueOf(t.getId()));
                 String status = CliFormatter.yellow("@" + String.valueOf(t.getStatus()));
                 String warning = t.getIsWarned() ? CliFormatter.boldRed("Yes") : CliFormatter.green("No");
                 String warningMessage = t.getReportWarning() == null ? "" : t.getReportWarning();
                 String ticketUser = t.getReportUsername() == null ? " " : t.getReportUsername();
-                ticket_details.add("Ticket ID: " + ticketIdOut + " | Status: " + status + "\nMessage: " + message + CliFormatter.boldRed(ticketUser) + "\nResponse: " + response + "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
+                ticket_details.add("Ticket ID: " + ticketIdOut + " " + ticketUserSend + " | Status: " + status + "\nMessage: " + message + CliFormatter.boldRed(ticketUser) + "\nResponse: " + response + "\nWarning: " + warning + " | " + CliFormatter.boldYellow(warningMessage));
             });
             PaginationUtil.paginate(ticket_details);
         } else {

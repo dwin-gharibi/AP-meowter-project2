@@ -10,10 +10,7 @@ import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.PaginationUtil;
 import ir.ac.kntu.Meowter.util.RedisHashtagUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class PostController {
 
@@ -128,7 +125,7 @@ public class PostController {
 
             try {
                 selectedPost = postRepository.findById(postIdToSelect);
-                if (selectedPost == null) {
+                if (selectedPost == null || !Objects.equals(selectedPost.getUser().getUsername(), loggedInUser.getUsername())) {
                     throw new Exception("Post does not exist");
                 }
                 String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(selectedPost.getId())) + "\n" +
@@ -159,11 +156,13 @@ public class PostController {
                 System.out.println(CliFormatter.boldRed("Something went wrong"));
                 return;
             }
-            displayPostDetails(loggedInUser, selectedPost);
+            if (!displayPostDetails(loggedInUser, selectedPost)) {
+                break;
+            }
         }
     }
 
-    private void displayPostDetails(User loggedInUser, Post selectedPost) {
+    private boolean displayPostDetails(User loggedInUser, Post selectedPost) {
         System.out.println(CliFormatter.boldBlue("1. Edit post"));
         System.out.println(CliFormatter.boldGreen("2. Delete post"));
         System.out.println(CliFormatter.boldBlue("3. Likes Details"));
@@ -188,11 +187,12 @@ public class PostController {
                 commentsDetails(loggedInUser, selectedPost);
                 break;
             case 5:
-                return;
+                return false;
             default:
                 System.out.println(CliFormatter.boldRed("Invalid option. Try again."));
-                break;
+                return false;
         }
+        return true;
     }
 
 

@@ -99,14 +99,69 @@ public class Main {
                             continue;
                         }
                     } else if (choice == 2) {
-                        userController.registerSection(loggedInUser);
+                        System.out.println(CliFormatter.boldBlue("⚠️ Registration Requirements:"));
+                        System.out.println(CliFormatter.bold("Please ensure the following before registering:"));
+                        System.out.println(CliFormatter.boldYellow("1. Username: ") +
+                                CliFormatter.bold("Username should be unique."));
+                        System.out.println(CliFormatter.boldYellow("2. Email: ") +
+                                CliFormatter.bold("Must be a valid and unique email address."));
+                        System.out.println(CliFormatter.boldYellow("3. Password: ") +
+                                CliFormatter.bold("Must be at least 8 characters long and include:"));
+                        System.out.println(CliFormatter.bold("   - ") + "One uppercase letter.");
+                        System.out.println(CliFormatter.bold("   - ") + "One lowercase letter.");
+                        System.out.println(CliFormatter.bold("   - ") + "One number.");
+                        System.out.println(CliFormatter.bold("   - ") + "One special character (e.g., !@#$%).");
+                        CliFormatter.printTypingEffect(CliFormatter.boldGreen("✔️ Ready to register? Follow the prompts below!"));
+
+                        System.out.println("\n------------");
+
+                        System.out.print(CliFormatter.boldPurple("Enter a username: "));
+                        String username = scanner.nextLine();
+                        System.out.print(CliFormatter.magenta("Enter your email: "));
+                        String email = scanner.nextLine();
+                        System.out.print(CliFormatter.red("Enter your password: "));
+                        String password = scanner.nextLine();
+
+                        try {
+                            loggedInUser = userService.register(username, email, password);
+                        } catch (Exception e) {
+                            System.out.println(CliFormatter.boldRed(e.getMessage()));
+                        }
+
+                        if (loggedInUser != null) {
+                            System.out.println(CliFormatter.boldGreen("Registration successful! You are now logged in."));
+                            SessionManager.saveSession(loggedInUser);
+                        }
                     } else {
                         CliFormatter.printTypingEffect("Turning back to main menu...");
                         continue;
                     }
                 }
             } else {
-                if(userController.menuSection(loggedInUser, role)) {
+                if(!loggedInUser.isActive()){
+                    System.out.println(CliFormatter.boldRed("Your account is Inactive!"));
+                    System.out.println(CliFormatter.yellow("For getting more information contact with admin."));
+                    CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
+                    SessionManager.clearSession();
+                    break;
+                }
+
+                if (role == Role.ADMIN) {
+                    AdminMenuHandler adminMenuHandler = new AdminMenuHandler();
+                    adminMenuHandler.displayAdminMenu(loggedInUser);
+                } else if (role == Role.SUPPORT) {
+                    SupportMenuHandler supportMenuHandler = new SupportMenuHandler();
+                    supportMenuHandler.displaySupportMenu(loggedInUser);
+                } else {
+                    MenuHandler menuHandler = new MenuHandler();
+                    menuHandler.displayMainMenu(loggedInUser, role);
+                }
+
+                CliFormatter.printTypingEffect("Do you want to log out? (y/n): ");
+                String logoutChoice = scanner.nextLine();
+                if ("y".equalsIgnoreCase(logoutChoice)) {
+                    CliFormatter.printTypingEffect(CliFormatter.boldRed("Logging out..."));
+                    SessionManager.clearSession();
                     loggedInUser = null;
                 }
             }

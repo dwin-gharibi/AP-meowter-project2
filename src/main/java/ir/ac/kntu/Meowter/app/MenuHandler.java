@@ -200,7 +200,7 @@ public class MenuHandler {
 
             System.out.println(postDetail);
         } catch (Exception e) {
-            System.out.println(CliFormatter.boldRed("Something went wrong"));
+            System.out.println(CliFormatter.boldRed("No post founded."));
         }
     }
 

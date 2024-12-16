@@ -5,6 +5,7 @@ import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.ValidationUtil;
 
 import java.time.LocalDateTime;
@@ -19,30 +20,44 @@ public class UserService {
     }
 
     public void createUser(String username, String email, String password, Role role) {
-        ValidationUtil.validateUsername(username);
-        ValidationUtil.validateEmail(email);
-        ValidationUtil.validatePassword(password);
+
+        try{
+            ValidationUtil.validateUsername(username);
+            ValidationUtil.validateEmail(email);
+            ValidationUtil.validatePassword(password);
+        } catch (Exception e) {
+            System.out.println(CliFormatter.boldRed(e.getMessage()));
+            return;
+        }
 
         User user = new User(username, email, password, role);
         userRepository.save(user);
     }
 
     public User updateUsername(User user, String newUsername) {
-        ValidationUtil.validateUsername(newUsername);
-
-        user.setUsername(newUsername);
-        userRepository.update(user);
-        SessionManager.saveSession(user);
-
+        try{
+            ValidationUtil.validateUsername(newUsername);
+            user.setUsername(newUsername);
+            userRepository.update(user);
+            SessionManager.saveSession(user);
+            CliFormatter.printTypingEffect(CliFormatter.boldGreen("Username updated successfully."));
+        } catch (Exception e) {
+            System.out.println(CliFormatter.boldRed(e.getMessage()));
+        }
         return user;
     }
 
     public User updatePassword(User user, String newPassword) {
-        ValidationUtil.validatePassword(newPassword);
+        try {
+            ValidationUtil.validatePassword(newPassword);
 
-        user.setPassword(newPassword);
-        userRepository.update(user);
-        SessionManager.saveSession(user);
+            user.setPassword(newPassword);
+            userRepository.update(user);
+            SessionManager.saveSession(user);
+            CliFormatter.printTypingEffect(CliFormatter.boldGreen("Password updated successfully."));
+        } catch (Exception e) {
+            System.out.println(CliFormatter.boldRed(e.getMessage()));
+        }
 
         return user;
     }

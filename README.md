@@ -1,6 +1,6 @@
 # Project 1
 
-![SystemDesign](./SystemDesign.png)
+![SystemDesign](./Meow.png)
 
 [Meowter](Project1_Final.pdf)
 

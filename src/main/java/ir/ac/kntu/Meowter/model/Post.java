@@ -36,6 +36,21 @@ public class Post {
     @Column(name = "hashtag")
     private Set<String> hashtags = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "post_labels", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "label")
+    private Set<PostLabel> labels = new HashSet<>();
+
+    public Set<PostLabel> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Set<PostLabel> labels) {
+        this.labels = labels;
+    }
+
+
     public Set<String> getHashtags() {
         return hashtags;
     }

@@ -1,6 +1,8 @@
 package ir.ac.kntu.Meowter.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "comments")
@@ -20,6 +22,13 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> replies = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
     public Comment() {}
 
@@ -61,6 +70,22 @@ public class Comment {
         this.user = user;
     }
 
+    public Set<Comment> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(Set<Comment> replies) {
+        this.replies = replies;
+    }
+
+    public Comment getParentComment() {
+        return parentComment;
+    }
+
+    public void setParentComment(Comment parentComment) {
+        this.parentComment = parentComment;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -78,9 +103,13 @@ public class Comment {
         return id != null ? id.hashCode() : 0;
     }
 
-    public void associatePostAndUser(Post post, User user) {
-        this.setPost(post);
-        this.setUser(user);
+    public void addReply(Comment reply) {
+        replies.add(reply);
+        reply.setParentComment(this);
     }
 
+    public void removeReply(Comment reply) {
+        replies.remove(reply);
+        reply.setParentComment(null);
+    }
 }

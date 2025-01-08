@@ -150,26 +150,6 @@ public class UserRepository {
         }
     }
 
-    public void sendFollowRequest(User loggedInUser, User recipientUser) {
-        FollowRequest existingRequest = this.findFollowRequest(loggedInUser, recipientUser);
-        if (existingRequest != null) {
-            System.out.println("Follow request already exists.");
-            return;
-        }
-
-        FollowRequest followRequest = new FollowRequest(loggedInUser, recipientUser);
-
-        if (!recipientUser.getIsPrivate()) {
-            followRequest.setStatus(FollowRequestStatus.ACCEPTED);
-            System.out.println("Follow request auto-accepted for public profile.");
-        } else {
-            followRequest.setStatus(FollowRequestStatus.PENDING);
-            System.out.println("Follow request sent and waiting for approval.");
-        }
-
-        this.saveFollowRequest(followRequest);
-    }
-
     public List<FollowRequest> getFollowRequests(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<FollowRequest> requests = null;

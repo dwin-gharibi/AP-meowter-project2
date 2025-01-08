@@ -51,7 +51,12 @@ public class User {
     @JsonIgnore
     private Set<User> followers = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_followings",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
     @JsonIgnore
     private Set<User> following = new HashSet<>();
 
@@ -218,6 +223,7 @@ public class User {
         this.following.remove(user);
         user.getFollowers().remove(this);
     }
+
 
     public void addLike(Like like) {
         this.likes.add(like);

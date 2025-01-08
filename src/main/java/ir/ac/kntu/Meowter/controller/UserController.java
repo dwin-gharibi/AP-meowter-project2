@@ -284,10 +284,10 @@ public class UserController {
         System.out.print("Accept (y/n)? ");
         String response = scanner.nextLine();
         if ("y".equalsIgnoreCase(response)) {
-            userService.acceptFollowRequest(loggedInUser, request.getRequester());
+            userService.acceptFollowRequest(loggedInUser, request);
             System.out.println("Follow request accepted.");
         } else {
-            userService.rejectFollowRequest(loggedInUser, request.getRequester());
+            userService.rejectFollowRequest(loggedInUser, request);
             System.out.println("Follow request rejected.");
         }
     }

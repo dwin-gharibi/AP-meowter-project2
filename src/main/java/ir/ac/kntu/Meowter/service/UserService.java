@@ -176,9 +176,9 @@ public class UserService {
         followRequest.setStatus(FollowRequestStatus.ACCEPTED);
         userRepository.updateFollowRequest(followRequest);
 
-        loggedInUser.followUser(followRequest.getRequester());
-        followRequest.getRequester().followUser(loggedInUser);
-
+        loggedInUser.followUser(followRequest.getRecipient());
+        userRepository.update(loggedInUser);
+        userRepository.update(followRequest.getRecipient());
         System.out.println("Follow request accepted successfully.");
     }
 
@@ -188,19 +188,6 @@ public class UserService {
         userRepository.updateFollowRequest(followRequest);
         System.out.println("Follow request rejected.");
     }
-
-    public void acceptFollowRequest(User loggedInUser, User requestUser) {
-        loggedInUser.getFollowing().add(requestUser);
-        requestUser.getFollowers().add(loggedInUser);
-        userRepository.update(loggedInUser);
-        userRepository.update(requestUser);
-    }
-
-    public void rejectFollowRequest(User loggedInUser, User requestUser) {
-        loggedInUser.getFollowRequestsSent().remove(requestUser);
-        userRepository.update(loggedInUser);
-    }
-
 
 
     public void viewAllUsers() {

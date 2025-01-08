@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.app;
 
 import ir.ac.kntu.Meowter.controller.UserController;
+import ir.ac.kntu.Meowter.model.Department;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.service.UserService;
@@ -11,6 +12,7 @@ import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.DateConverter;
 import ir.ac.kntu.Meowter.exceptions.CaptchaVerificationException;
 
+import java.util.Collections;
 import java.util.Scanner;
 
 //   userService.createUser("admin", "admin@admin.com", "Admin@123", Role.ADMIN);

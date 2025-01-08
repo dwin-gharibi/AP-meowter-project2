@@ -69,6 +69,11 @@ public class User {
     @JsonIgnore
     private Set<Like> likes = new HashSet<>();
 
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @Column(name = "department", nullable = true)
+    @JsonIgnore
+    private Set<Department> departments = new HashSet<>();
 
     @Column(nullable = false)
     private boolean isPrivate;
@@ -83,6 +88,18 @@ public class User {
         this.active = true;
         this.isPrivate = false;
         this.bio = "";
+    }
+
+    public Set<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(Set<Department> departments) {
+        this.departments = departments;
+    }
+
+    public void addDepartment(Department department) {
+        departments.add(department);
     }
 
     public boolean getIsPrivate() {

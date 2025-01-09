@@ -33,7 +33,7 @@ public class PostController {
             System.out.println(CliFormatter.boldBlue("1. View My Posts"));
             System.out.println(CliFormatter.boldGreen("2. Add a New Post"));
             System.out.println(CliFormatter.boldBlue("3. Select a post"));
-            System.out.println(CliFormatter.boldYellow("4. Handle Requests (L[id], C[id], #[hashtag])"));
+            System.out.println(CliFormatter.boldYellow("4. Handle Requests (L[id], C[id], R[id], #[hashtag])"));
             System.out.println(CliFormatter.boldPurple("5. Back to Main Menu"));
             System.out.print(CliFormatter.magenta("Choose an option: "));
             int choice = scanner.nextInt();
@@ -80,13 +80,7 @@ public class PostController {
 
                 if (!post.getComments().isEmpty()) {
                     StringBuilder commentsDetails = new StringBuilder();
-                    post.getComments().forEach(comment -> {
-                        commentsDetails.append("    - Comment by ")
-                                .append(CliFormatter.blue(comment.getUser().getUsername()))
-                                .append(": ")
-                                .append(CliFormatter.cyan(comment.getContent()))
-                                .append("\n");
-                    });
+                    processComments(post.getComments(), commentsDetails, 1);
                     postDetail += commentsDetails.toString();
                 } else {
                     postDetail += CliFormatter.red("    No comments yet.\n");
@@ -139,13 +133,7 @@ public class PostController {
 
                 if (!selectedPost.getComments().isEmpty()) {
                     StringBuilder commentsDetails = new StringBuilder();
-                    selectedPost.getComments().forEach(comment -> {
-                        commentsDetails.append("    - Comment by ")
-                                .append(CliFormatter.blue(comment.getUser().getUsername()))
-                                .append(": ")
-                                .append(CliFormatter.cyan(comment.getContent()))
-                                .append("\n");
-                    });
+                    processComments(selectedPost.getComments(), commentsDetails, 1);
                     postDetail += commentsDetails.toString();
                 } else {
                     postDetail += CliFormatter.red("    No comments yet.\n");
@@ -270,7 +258,7 @@ public class PostController {
     }
 
     public void handleRequests(User loggedInUser, Scanner scanner) {
-        System.out.println("Handle requests like L[id], C[id], #[hashtag]. Type 'back' to return.");
+        System.out.println("Handle requests like L[id], C[id], R[id], #[hashtag]. Type 'back' to return.");
         while (true) {
             System.out.print("Enter your request: ");
             String input = scanner.nextLine();
@@ -281,12 +269,12 @@ public class PostController {
 
             if (input.startsWith("L")) {
                 handleLikeRequest(loggedInUser, input);
-            } else if (input.startsWith("C")) {
-                handleCommentRequest(loggedInUser, scanner, input);
+            } else if (input.startsWith("C") || input.startsWith("R")) {
+                handleCommentRequest(loggedInUser, scanner, input, input.startsWith("R"));
             } else if (input.startsWith("#")) {
                 handleHashtagSearch(input);
             } else {
-                System.out.println("Invalid request. Use L[id], C[id], or #[hashtag].");
+                System.out.println("Invalid request. Use L[id], C[id], R[id] or #[hashtag].");
             }
         }
     }
@@ -305,20 +293,51 @@ public class PostController {
         }
     }
 
-    private void handleCommentRequest(User loggedInUser, Scanner scanner, String input) {
+    private void handleCommentRequest(User loggedInUser, Scanner scanner, String input, boolean nestedComment) {
         try {
-            long postId = Long.parseLong(input.substring(1));
-            System.out.print("Enter your comment: ");
-            String commentContent = scanner.nextLine();
-            boolean success = postService.addComment(loggedInUser, postId, commentContent);
-            if (success) {
-                System.out.println("Your comment was added to post ID: " + postId);
+            if (nestedComment) {
+                long CommentId = Long.parseLong(input.substring(1));
+                System.out.print("Enter your reply comment: ");
+                String commentContent = scanner.nextLine();
+                boolean success = postService.addComment(loggedInUser, CommentId, commentContent, nestedComment);
+                if (success) {
+                    System.out.println("Your comment was replied to comment ID: " + CommentId);
+                } else {
+                    System.out.println("Failed to add reply comment. It might not exist.");
+                }
             } else {
-                System.out.println("Failed to comment on the post. It might not exist.");
+                long postId = Long.parseLong(input.substring(1));
+                System.out.print("Enter your comment: ");
+                String commentContent = scanner.nextLine();
+                boolean success = postService.addComment(loggedInUser, postId, commentContent, nestedComment);
+                if (success) {
+                    System.out.println("Your comment was added to post ID: " + postId);
+                } else {
+                    System.out.println("Failed to comment on the post. It might not exist.");
+                }
             }
+
         } catch (NumberFormatException e) {
             System.out.println("Invalid format for comment request. Use C[id].");
         }
+    }
+
+    private void processComments(Set<Comment> comments, StringBuilder commentsDetails, int level) {
+        String indentation = "    ".repeat(level);
+        comments.forEach(comment -> {
+            commentsDetails.append(indentation)
+                    .append("- Comment by ")
+                    .append(CliFormatter.blue(comment.getUser().getUsername()))
+                    .append(": ")
+                    .append(CliFormatter.cyan(comment.getContent()))
+                    .append(" #")
+                    .append(CliFormatter.yellow(comment.getId().toString()))
+                    .append("\n");
+
+            if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
+                processComments(comment.getReplies(), commentsDetails, level + 1);
+            }
+        });
     }
 
     private void handleHashtagSearch(String input) {
@@ -339,13 +358,7 @@ public class PostController {
 
                 if (!post.getComments().isEmpty()) {
                     StringBuilder commentsDetails = new StringBuilder();
-                    post.getComments().forEach(comment -> {
-                        commentsDetails.append("    - Comment by ")
-                                .append(CliFormatter.blue(comment.getUser().getUsername()))
-                                .append(": ")
-                                .append(CliFormatter.cyan(comment.getContent()))
-                                .append("\n");
-                    });
+                    processComments(post.getComments(), commentsDetails, 1);
                     postDetail += commentsDetails.toString();
                 } else {
                     postDetail += CliFormatter.red("    No comments yet.\n");

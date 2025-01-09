@@ -61,7 +61,10 @@ public class UserController {
                     StringBuilder commentsDetails = new StringBuilder();
                     post.getComments().forEach(comment -> {
                         if (comment.getUser().isActive()) {
-                            commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                            commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent()))
+                                    .append(" #")
+                                    .append(CliFormatter.yellow(comment.getId().toString()))
+                                    .append("\n");
                         } else {
                             commentsDetails.append(CliFormatter.boldRed("    - Comment hidden because user is inactive ")).append("\n");
                         }
@@ -325,7 +328,10 @@ public class UserController {
                         StringBuilder commentsDetails = new StringBuilder();
                         post.getComments().forEach(comment -> {
                             if (comment.getUser().isActive()) {
-                                commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append("\n");
+                                commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent()))
+                                        .append(" #")
+                                        .append(CliFormatter.yellow(comment.getId().toString()))
+                                        .append("\n");
                             } else {
                                 commentsDetails.append(CliFormatter.boldRed("    - Comment hidden because user is inactive ")).append("\n");
                             }

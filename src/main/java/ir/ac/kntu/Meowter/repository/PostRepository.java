@@ -98,6 +98,21 @@ public class PostRepository {
         return post;
     }
 
+    public Comment findByIdComment(Long commentId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Comment comment = null;
+
+        try {
+            comment = session.get(Comment.class, commentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return comment;
+    }
+
     public List<Post> findAll() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<Post> posts = null;
@@ -176,6 +191,28 @@ public class PostRepository {
             Comment comment = new Comment(content, post, user);
             session.save(comment);
             post.addComment(comment);
+            session.update(post);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void addComment(User user, Comment comment, String content) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            Post post = comment.getPost();
+            Comment new_comment = new Comment(content, post, user, comment);
+            session.save(new_comment);
+            post.addComment(new_comment);
             session.update(post);
             transaction.commit();
         } catch (Exception e) {

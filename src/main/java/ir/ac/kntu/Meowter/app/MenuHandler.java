@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.app;
 
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
+import ir.ac.kntu.Meowter.model.Comment;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
@@ -20,6 +21,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class MenuHandler {
 
@@ -186,13 +188,7 @@ public class MenuHandler {
 
             if (!selectedPost.getComments().isEmpty()) {
                 StringBuilder commentsDetails = new StringBuilder();
-                selectedPost.getComments().forEach(comment -> {
-                    commentsDetails.append("    - Comment by ")
-                            .append(CliFormatter.blue(comment.getUser().getUsername()))
-                            .append(": ")
-                            .append(CliFormatter.cyan(comment.getContent()))
-                            .append("\n");
-                });
+                processComments(selectedPost.getComments(), commentsDetails, 1);
                 postDetail += commentsDetails.toString();
             } else {
                 postDetail += CliFormatter.red("    No comments yet.\n");
@@ -204,9 +200,27 @@ public class MenuHandler {
         }
     }
 
+    private void processComments(Set<Comment> comments, StringBuilder commentsDetails, int level) {
+        String indentation = "    ".repeat(level);
+        comments.forEach(comment -> {
+            commentsDetails.append(indentation)
+                    .append("- Comment by ")
+                    .append(CliFormatter.blue(comment.getUser().getUsername()))
+                    .append(": ")
+                    .append(CliFormatter.cyan(comment.getContent()))
+                    .append(" #")
+                    .append(CliFormatter.yellow(comment.getId().toString()))
+                    .append("\n");
+
+            if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
+                processComments(comment.getReplies(), commentsDetails, level + 1);
+            }
+        });
+    }
+
     private void handlePostRequests(User loggedInUser, Scanner scanner) {
         while (true) {
-            System.out.println(CliFormatter.boldYellow("1. Handle Requests (L[id], C[id], #[hashtag])"));
+            System.out.println(CliFormatter.boldYellow("1. Handle Requests (L[id], C[id], R[id] #[hashtag])"));
             System.out.println(CliFormatter.boldPurple("2. Back to Main Menu"));
             System.out.print(CliFormatter.magenta("Choose an option: "));
             int choice_request = scanner.nextInt();

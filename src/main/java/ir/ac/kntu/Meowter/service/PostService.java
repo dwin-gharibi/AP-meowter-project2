@@ -1,5 +1,7 @@
 package ir.ac.kntu.Meowter.service;
 
+import io.prometheus.metrics.model.registry.Collector;
+import ir.ac.kntu.Meowter.model.Comment;
 import ir.ac.kntu.Meowter.model.Post;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.PostRepository;
@@ -38,7 +40,8 @@ public class PostService {
 
         redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
 
-
+        PrometheusUtil.POST_CREATED.labelValues(user.getUsername()).inc();
+        trackActiveTime(user, 5, true);
         Post post = new Post(content, user);
         postRepository.save(post);
     }
@@ -150,6 +153,8 @@ public class PostService {
         }
 
         postRepository.addLike(user, post);
+        PrometheusUtil.LIKE_ADDED.labelValues(user.getUsername()).inc();
+        trackActiveTime(user, 5, true);
         return true;
     }
 
@@ -261,17 +266,33 @@ public class PostService {
         }
 
         postRepository.removeLike(user, post);
+        PrometheusUtil.LIKE_REMOVED.labelValues(user.getUsername()).inc();
+        trackActiveTime(user, 5, true);
         System.out.println("Like removed successfully.");
     }
 
-    public boolean addComment(User user, long postId, String content) {
-        Post post = postRepository.findById(postId);
-        if (post == null) {
-            return false;
+    public boolean addComment(User user, long postId, String content, boolean nestedComment) {
+        if (nestedComment) {
+            Comment comment = postRepository.findByIdComment(postId);
+            if (comment == null) {
+                return false;
+            }
+            PrometheusUtil.COMMENT_ADDED.labelValues(user.getUsername()).inc();
+            postRepository.addComment(user, comment, content);
+            return true;
+        } else {
+            Post post = postRepository.findById(postId);
+            if (post == null) {
+                return false;
+            }
+            PrometheusUtil.COMMENT_ADDED.labelValues(user.getUsername()).inc();
+            postRepository.addComment(user, post, content);
+            return true;
         }
+    }
 
-        postRepository.addComment(user, post, content);
-        return true;
+    public void trackActiveTime(User user, long duration, boolean isActive) {
+        PrometheusUtil.USER_ACTIVE_TIME.labelValues(user.getUsername(), isActive ? "active" : "inactive").inc(duration);
     }
 
     public void removeComment(User user, long postId, long commentId) {

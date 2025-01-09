@@ -23,7 +23,7 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Comment> replies = new HashSet<>();
 
     @ManyToOne
@@ -36,6 +36,14 @@ public class Comment {
         this.content = content;
         this.post = post;
         this.user = user;
+    }
+
+    public Comment(String content, Post post, User user, Comment comment) {
+        this.content = content;
+        this.post = post;
+        this.user = user;
+        this.parentComment = comment;
+        replies.add(comment);
     }
 
     public Long getId() {

@@ -4,6 +4,7 @@ import ir.ac.kntu.Meowter.controller.UserController;
 import ir.ac.kntu.Meowter.model.Department;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.service.PrometheusExporter;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
@@ -20,6 +21,17 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+        PrometheusExporter exporter = new PrometheusExporter();
+
+        try {
+            exporter.startExporter();
+            System.out.println("Prometheus HTTP server is running on http://localhost:9090/metrics");
+        } catch (Exception e) {
+            System.err.println("Failed to start Prometheus HTTP server: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         CliFormatter.printMeow();
         Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();

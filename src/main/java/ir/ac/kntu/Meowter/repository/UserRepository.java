@@ -1,6 +1,7 @@
 package ir.ac.kntu.Meowter.repository;
 
 import ir.ac.kntu.Meowter.model.FollowRequest;
+import ir.ac.kntu.Meowter.model.Notification;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.model.FollowRequestStatus;
 import ir.ac.kntu.Meowter.util.HibernateUtil;
@@ -185,6 +186,42 @@ public class UserRepository {
         } finally {
             session.close();
         }
+    }
+
+    public void saveNotification(Notification notification) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            session.saveOrUpdate(notification);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public List<Notification> getNotifications(User user) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Notification> notifications = null;
+
+        try {
+            String hql = "FROM Notification nt WHERE nt.notifiee = :user";
+            notifications = session.createQuery(hql, Notification.class)
+                    .setParameter("user", user)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return notifications;
     }
 
 

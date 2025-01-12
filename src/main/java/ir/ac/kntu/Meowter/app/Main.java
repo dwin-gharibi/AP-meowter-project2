@@ -4,16 +4,17 @@ import ir.ac.kntu.Meowter.controller.UserController;
 import ir.ac.kntu.Meowter.model.Department;
 import ir.ac.kntu.Meowter.model.Role;
 import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.service.NotificationService;
 import ir.ac.kntu.Meowter.service.PrometheusExporter;
 import ir.ac.kntu.Meowter.service.UserService;
 import ir.ac.kntu.Meowter.service.SessionManager;
 import ir.ac.kntu.Meowter.exceptions.InvalidCommandException;
-import ir.ac.kntu.Meowter.util.ArithmeticCaptchaUtil;
-import ir.ac.kntu.Meowter.util.CliFormatter;
-import ir.ac.kntu.Meowter.util.DateConverter;
+import ir.ac.kntu.Meowter.util.*;
 import ir.ac.kntu.Meowter.exceptions.CaptchaVerificationException;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 //   userService.createUser("admin", "admin@admin.com", "Admin@123", Role.ADMIN);
@@ -21,6 +22,27 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+
+        // Initialize KafkaUtil
+        KafkaUtil kafkaUtil = new KafkaUtil(
+                "localhost:9092",
+                "localhost:9092",
+                "notification-group",
+                "notifications"
+        );
+
+        Neo4jUtil neo4jUtil = new Neo4jUtil("bolt://localhost:7687", "neo4j", "password");
+
+        NotificationService notificationService = new NotificationService(kafkaUtil, "notifications");
+
+
+//        notificationService.sendNotification(user1, user1, "FOLLOW", "Message");
+//        List<Map<String, Object>> notifications = notificationService.getNotifications(user2);
+//        notifications.forEach(System.out::println);
+
+
+        
 
         PrometheusExporter exporter = new PrometheusExporter();
 
@@ -159,6 +181,8 @@ public class Main {
                     SessionManager.clearSession();
                     break;
                 }
+                final User user = loggedInUser;
+                new Thread(() -> notificationService.startListening(user)).start();
 
                 if (role == Role.ADMIN) {
                     AdminMenuHandler adminMenuHandler = new AdminMenuHandler();

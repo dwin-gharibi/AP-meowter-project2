@@ -19,11 +19,19 @@ public class PostService {
 
     private PostRepository postRepository;
     private UserRepository userRepository;
+    private NotificationService notificationService;
     private final RedisUtil redisUtil = new RedisUtil();
 
     public PostService() {
         this.postRepository = new PostRepository();
         this.userRepository = new UserRepository();
+        KafkaUtil kafkaUtil = new KafkaUtil(
+                "localhost:9092",
+                "localhost:9092",
+                "notification-group",
+                "notifications"
+        );
+        this.notificationService = new NotificationService(kafkaUtil, "notifications");
     }
 
     public void createPost(String content, User user) {
@@ -154,6 +162,9 @@ public class PostService {
 
         postRepository.addLike(user, post);
         PrometheusUtil.LIKE_ADDED.labelValues(user.getUsername()).inc();
+
+        notificationService.sendNotification(user, post.getUser(), "LIKE", "Post with id " + CliFormatter.boldBlue("#" + postId) + " liked by " + user.getUsername());
+
         trackActiveTime(user, 5, true);
         return true;
     }

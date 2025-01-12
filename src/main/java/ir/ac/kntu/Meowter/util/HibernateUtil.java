@@ -17,6 +17,8 @@ public class HibernateUtil {
                     .addAnnotatedClass(Post.class)
                     .addAnnotatedClass(Like.class)
                     .addAnnotatedClass(Comment.class)
+                    .addAnnotatedClass(Notification.class)
+                    .addAnnotatedClass(Message.class)
                     .addAnnotatedClass(Ticket.class)
                     .addAnnotatedClass(FollowRequest.class)
                     .buildSessionFactory();

@@ -3,6 +3,7 @@ package ir.ac.kntu.Meowter.service;
 import ir.ac.kntu.Meowter.model.Notification;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.UserRepository;
+import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.KafkaUtil;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class NotificationService {
             String content = parts[3];
 
             if (loggedinUser.getId().equals(notifieeId)) {
+                System.out.print(CliFormatter.cyan("NEW NOTIFICATION:"));
                 System.out.println(message);
             }
         });

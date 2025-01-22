@@ -99,13 +99,17 @@ public class PostController {
         System.out.print(CliFormatter.magenta("Enter post content: "));
         String content = scanner.nextLine();
 
+        System.out.print(CliFormatter.magenta("Enter post labels (Multi Label Select using ,): "));
+        System.out.print(CliFormatter.boldBlue("Available Labels: #SPORT, #ART, #TECHNOLOGY, #TRAVEL, #FOOD, #ENTERTAINMENT, #EDUCATION\n"));
+        String labels = scanner.nextLine();
+
         System.out.print(CliFormatter.boldGreen("- Do you want @AI to correct your post grammar and punctuation? "));
         boolean flagChecker = scanner.nextBoolean();
 
         System.out.print(CliFormatter.boldBlue("- Do you want @AI to describe your post? "));
         boolean flagDescribe = scanner.nextBoolean();
 
-        postService.addPost(loggedInUser, content, flagChecker, flagDescribe);
+        postService.addPost(loggedInUser, content, flagChecker, flagDescribe, labels);
     }
 
     private void selectPost(User loggedInUser, Scanner scanner) {

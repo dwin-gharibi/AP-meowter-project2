@@ -176,7 +176,7 @@ public class PostService {
         return postRepository.findByUser(user);
     }
 
-    public void addPost(User user, String content, boolean flagChecker, boolean flagDescribe) {
+    public void addPost(User user, String content, boolean flagChecker, boolean flagDescribe, String labels) {
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("User must not be null and must have a valid ID.");
         }
@@ -199,7 +199,7 @@ public class PostService {
         redisUtil.publish("post_channel", "New post from " + user.getUsername() + ": " + content);
 
 
-        Post post = new Post(content, user);
+        Post post = new Post(content, user, labels);
         postRepository.save(post);
         System.out.println("Post added successfully.");
     }

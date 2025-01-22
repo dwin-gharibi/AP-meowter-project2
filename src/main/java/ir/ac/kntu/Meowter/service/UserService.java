@@ -1,14 +1,13 @@
 package ir.ac.kntu.Meowter.service;
 
-import ir.ac.kntu.Meowter.model.FollowRequest;
-import ir.ac.kntu.Meowter.model.FollowRequestStatus;
-import ir.ac.kntu.Meowter.model.Role;
-import ir.ac.kntu.Meowter.model.User;
+import ir.ac.kntu.Meowter.model.*;
 import ir.ac.kntu.Meowter.repository.UserRepository;
 import ir.ac.kntu.Meowter.util.CliFormatter;
 import ir.ac.kntu.Meowter.util.ValidationUtil;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class UserService {
@@ -64,6 +63,19 @@ public class UserService {
 
     public User updateBio(User user, String newBio) {
         user.setBio(newBio);
+        userRepository.update(user);
+        SessionManager.saveSession(user);
+
+        return user;
+    }
+
+    public User setLabels(User user, String labels) {
+
+        user.setUser_labels(Collections.emptySet());
+        List<String> labelList = Arrays.asList(labels.split(","));
+        for (String label : labelList) {
+            user.addLabel(PostLabel.valueOf(label));
+        }
         userRepository.update(user);
         SessionManager.saveSession(user);
 

@@ -135,6 +135,14 @@ public class MenuHandler {
                     break;
 
                 case 4:
+                    System.out.print("Enter new labels: ");
+                    System.out.print(CliFormatter.boldBlue("Available Labels: #SPORT, #ART, #TECHNOLOGY, #TRAVEL, #FOOD, #ENTERTAINMENT, #EDUCATION\n"));
+                    String newlabels = scanner.nextLine();
+                    userService.setLabels(loggedInUser, newlabels);
+                    CliFormatter.printTypingEffect(CliFormatter.boldGreen("Favorite labels updated successfully."));
+                    return;
+
+                case 5:
                     return;
 
                 default:
@@ -148,7 +156,8 @@ public class MenuHandler {
         System.out.println(CliFormatter.boldGreen("1. Subscribe to publisher"));
         System.out.println(CliFormatter.boldBlue("2. View followings posts"));
         System.out.println(CliFormatter.boldRed("3. Change date filter"));
-        System.out.println(CliFormatter.boldPurple("4. Go Back"));
+        System.out.println(CliFormatter.boldRed("4. Set favorite labels"));
+        System.out.println(CliFormatter.boldPurple("5. Go Back"));
     }
 
     private void subscribeToPublisher() {
@@ -169,7 +178,12 @@ public class MenuHandler {
         Date start_date_new = start_date != null ? Date.from(start_date.atZone(ZoneId.systemDefault()).toInstant()) : null;
         Date end_date_new = end_date != null ? Date.from(end_date.atZone(ZoneId.systemDefault()).toInstant()) : null;
 
-        posts.stream()
+        posts.stream().filter(post -> {
+                    if (loggedInUser.getUser_labels().isEmpty()) {
+                        return true;
+                    }
+                    return post.getLabels().stream().anyMatch(loggedInUser.getUser_labels()::contains);
+                })
                 .filter(post -> (start_date_new == null || !post.getCreatedAt().before(start_date_new)) &&
                         (end_date_new == null || !post.getCreatedAt().after(end_date_new)))
                 .forEach(this::displayPost);

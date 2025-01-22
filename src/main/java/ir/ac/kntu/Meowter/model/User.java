@@ -61,6 +61,12 @@ public class User {
     private Set<User> following = new HashSet<>();
 
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_labels", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "label")
+    private Set<PostLabel> user_labels = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -274,4 +280,19 @@ public class User {
         this.followRequestsSent = followRequestsSent;
     }
 
+    public void addLabel(PostLabel label) {
+        this.user_labels.add(label);
+    }
+
+    public void removeLabel(PostLabel label) {
+        this.user_labels.remove(label);
+    }
+
+    public void setUser_labels(Set<PostLabel> user_labels) {
+        this.user_labels = user_labels;
+    }
+
+    public Set<PostLabel> getUser_labels() {
+        return user_labels;
+    }
 }

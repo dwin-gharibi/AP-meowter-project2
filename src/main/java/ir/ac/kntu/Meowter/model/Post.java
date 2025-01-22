@@ -77,6 +77,16 @@ public class Post {
         this.createdAt = new Date();
     }
 
+    public Post(String content, User user, String labels) {
+        this.content = content;
+        this.user = user;
+        this.createdAt = new Date();
+        List<String> labelList = Arrays.asList(labels.split(","));
+        for (String label : labelList) {
+            this.addLabel(PostLabel.valueOf(label));
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -160,5 +170,13 @@ public class Post {
     public void removeLike(Like like) {
         this.likes.remove(like);
         like.setPost(null);
+    }
+
+    public void addLabel(PostLabel label) {
+        this.labels.add(label);
+    }
+
+    public void removeLabel(PostLabel label) {
+        this.labels.remove(label);
     }
 }

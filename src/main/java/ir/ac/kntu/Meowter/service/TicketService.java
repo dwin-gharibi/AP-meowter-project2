@@ -5,6 +5,7 @@ import ir.ac.kntu.Meowter.model.Ticket;
 import ir.ac.kntu.Meowter.model.TicketStatus;
 import ir.ac.kntu.Meowter.model.TicketSubject;
 import ir.ac.kntu.Meowter.repository.TicketRepository;
+import ir.ac.kntu.Meowter.util.TicketAutoResponder;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class TicketService {
     public Ticket createTicket(String description, TicketSubject subject, String username) {
         Ticket ticket = new Ticket(description, subject, username);
         ticketRepository.save(ticket);
+        TicketAutoResponder.monitorTicket(ticket);
         return ticket;
     }
 
@@ -34,6 +36,7 @@ public class TicketService {
         ticket.setResponse(response);
         ticket.setStatus(TicketStatus.PENDING);
         ticketRepository.update(ticket);
+        TicketAutoResponder.cancelAutoResponse(ticket.getId());
     }
 
     public void closeTicket(Ticket ticket) {

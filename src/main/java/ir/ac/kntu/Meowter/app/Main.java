@@ -52,6 +52,12 @@ public class Main {
         if (loggedInUser != null) {
             System.out.println(CliFormatter.blueUnderlined("❇\uFE0F Welcome back, @" + loggedInUser.getUsername() + "! ❇\uFE0F"));
             role = loggedInUser.getRole();
+            if (role.equals(Role.SUPPORT)) {
+                System.out.print(CliFormatter.boldYellow("\nYour departments: \n"));
+                for (Department department : loggedInUser.getDepartments()){
+                    System.out.print(department.toString());
+                }
+            }
         }
         while (true) {
             if (loggedInUser == null) {

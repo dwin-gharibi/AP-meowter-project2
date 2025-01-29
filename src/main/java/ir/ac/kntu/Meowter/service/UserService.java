@@ -70,7 +70,7 @@ public class UserService {
         return user;
     }
 
-    public User setLabels(User user, String labels) {
+    public void setLabels(User user, String labels) {
 
         user.setUser_labels(Collections.emptySet());
         List<String> labelList = Arrays.asList(labels.split(","));
@@ -80,7 +80,18 @@ public class UserService {
         userRepository.update(user);
         SessionManager.saveSession(user);
 
-        return user;
+    }
+
+    public void setDepartments(User user, String departments) {
+
+        user.setDepartments(Collections.emptySet());
+        List<String> departmentlist = Arrays.asList(departments.split(","));
+        for (String department : departmentlist) {
+            user.addLabel(PostLabel.valueOf(department));
+        }
+        userRepository.update(user);
+        SessionManager.saveSession(user);
+
     }
 
     public User updateDateOfBirth(User user, LocalDateTime dateOfBirth) {

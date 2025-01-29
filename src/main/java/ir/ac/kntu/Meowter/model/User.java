@@ -75,7 +75,7 @@ public class User {
     @JsonIgnore
     private Set<Like> likes = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(name = "department", nullable = true)
     @JsonIgnore

@@ -332,7 +332,10 @@ public class AdminMenuHandler {
         System.out.println(CliFormatter.cyan("3. Update Bio"));
         System.out.println(CliFormatter.magenta("4. Update Labels"));
         System.out.println(CliFormatter.yellow("5. Update Privacy Setting"));
-        System.out.println(CliFormatter.magenta("6. Return to main menu"));
+        if (user.getRole() == Role.USER) {
+            System.out.println(CliFormatter.yellow("6. Update Department Setting"));
+        }
+        System.out.println(CliFormatter.magenta("7. Return to main menu"));
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -364,6 +367,11 @@ public class AdminMenuHandler {
                 userService.updatePrivacySetting(user, isPrivate);
                 break;
             case 6:
+                System.out.print("Enter new departments (comma-separated): ");
+                String departments = scanner.nextLine();
+                userService.setDepartments(user, departments);
+                break;
+            case 7:
                 return;
             default:
                 System.out.println(CliFormatter.red("Invalid option."));

@@ -224,6 +224,41 @@ public class UserRepository {
         return notifications;
     }
 
+    public List<Notification> getAllNotifications() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Notification> notifications = null;
+
+        try {
+            String hql = "FROM Notification";
+            notifications = session.createQuery(hql, Notification.class)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return notifications;
+    }
+
+    public Notification getNotificationById(int id) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Notification> notifications = null;
+
+        try {
+            String hql = "FROM Notification nt WHERE nt.id = :id";
+            notifications = session.createQuery(hql, Notification.class)
+                    .setParameter("id", (long) id)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return notifications != null && !notifications.isEmpty() ? notifications.get(0) : null;
+    }
+
 
 
 }

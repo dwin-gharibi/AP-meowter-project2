@@ -3,8 +3,11 @@ package ir.ac.kntu.Meowter.service;
 import ir.ac.kntu.Meowter.model.Message;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.MessageRepository;
+import ir.ac.kntu.Meowter.util.RabbitMQUtil;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MessageService {
 
@@ -12,6 +15,7 @@ public class MessageService {
 
     public MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
+        RabbitMQUtil.initializeQueue();
     }
 
     public void sendMessage(User sender, User recipient, String content) {
@@ -24,6 +28,11 @@ public class MessageService {
 
         Message message = new Message(sender, recipient, content);
         messageRepository.save(message);
+
+        String messagePayload = String.format(
+                "{\"senderId\":%d,\"recipientId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\"}",
+                sender.getId(), recipient.getId(), content, message.getTimestamp());
+        RabbitMQUtil.sendMessage(messagePayload);
     }
 
     public List<Message> getMessagesBySender(User sender) {
@@ -53,5 +62,20 @@ public class MessageService {
         }
         messageRepository.markAsRead(messageId);
     }
-}
 
+    public Set<User> getChatUsers(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User must not be null.");
+        }
+
+        List<User> senders = messageRepository.findSendersByRecipient(user);
+
+        List<User> recipients = messageRepository.findRecipientsBySender(user);
+
+        Set<User> chatUsers = new HashSet<>();
+        chatUsers.addAll(senders);
+        chatUsers.addAll(recipients);
+
+        return chatUsers;
+    }
+}

@@ -1,7 +1,11 @@
 package ir.ac.kntu.Meowter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tickets")
@@ -32,6 +36,12 @@ public class Ticket {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ticket_department", nullable = true)
+    @JsonIgnore
+    private Set<Department> departments = new HashSet<>();
 
     public Ticket() {}
 

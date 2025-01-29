@@ -18,7 +18,7 @@ public class UserService {
         this.userRepository = new UserRepository();
     }
 
-    public void createUser(String username, String email, String password, Role role) {
+    public boolean createUser(String username, String email, String password, Role role) {
 
         try{
             ValidationUtil.validateUsername(username);
@@ -26,11 +26,12 @@ public class UserService {
             ValidationUtil.validatePassword(password);
         } catch (Exception e) {
             System.out.println(CliFormatter.boldRed(e.getMessage()));
-            return;
+            return false;
         }
 
         User user = new User(username, email, password, role);
         userRepository.save(user);
+        return true;
     }
 
     public User updateUsername(User user, String newUsername) {

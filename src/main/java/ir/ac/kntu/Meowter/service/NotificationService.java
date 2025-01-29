@@ -8,6 +8,7 @@ import ir.ac.kntu.Meowter.util.KafkaUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class NotificationService {
 
@@ -30,7 +31,15 @@ public class NotificationService {
     }
 
     public List<Notification> getNotifications(User user) {
-        return userRepository.getNotifications(user);
+        return userRepository.getNotifications(user).stream().filter(notification -> notification.getActive() == true).collect(Collectors.toList());
+    }
+
+    public List<Notification> getAllNotifications() {
+        return userRepository.getAllNotifications();
+    }
+
+    public Notification getNotificationById(int id) {
+        return userRepository.getNotificationById(id);
     }
 
     public void startListening(User loggedinUser) {

@@ -99,5 +99,37 @@ public class MessageRepository {
             session.close();
         }
     }
+
+    public List<User> findSendersByRecipient(User recipient) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<User> senders = null;
+
+        try {
+            String hql = "SELECT DISTINCT m.sender FROM Message m WHERE m.recipient = :recipient";
+            senders = session.createQuery(hql, User.class)
+                    .setParameter("recipient", recipient)
+                    .getResultList();
+        } finally {
+            session.close();
+        }
+
+        return senders;
+    }
+
+    public List<User> findRecipientsBySender(User sender) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<User> recipients = null;
+
+        try {
+            String hql = "SELECT DISTINCT m.recipient FROM Message m WHERE m.sender = :sender";
+            recipients = session.createQuery(hql, User.class)
+                    .setParameter("sender", sender)
+                    .getResultList();
+        } finally {
+            session.close();
+        }
+
+        return recipients;
+    }
 }
 

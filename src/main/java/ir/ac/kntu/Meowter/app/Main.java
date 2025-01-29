@@ -22,9 +22,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
-
-        // Initialize KafkaUtil
         KafkaUtil kafkaUtil = new KafkaUtil(
                 "localhost:9092",
                 "localhost:9092",
@@ -35,14 +32,6 @@ public class Main {
         Neo4jUtil neo4jUtil = new Neo4jUtil("bolt://localhost:7687", "neo4j", "password");
 
         NotificationService notificationService = new NotificationService(kafkaUtil, "notifications");
-
-
-//        notificationService.sendNotification(user1, user1, "FOLLOW", "Message");
-//        List<Map<String, Object>> notifications = notificationService.getNotifications(user2);
-//        notifications.forEach(System.out::println);
-
-
-        
 
         PrometheusExporter exporter = new PrometheusExporter();
 

@@ -30,9 +30,7 @@ public class Main {
         );
 
         Neo4jUtil neo4jUtil = new Neo4jUtil("bolt://localhost:7687", "neo4j", "password");
-
         NotificationService notificationService = new NotificationService(kafkaUtil, "notifications");
-
         PrometheusExporter exporter = new PrometheusExporter();
 
         try {
@@ -144,7 +142,10 @@ public class Main {
                         System.out.println(CliFormatter.bold("   - ") + "One special character (e.g., !@#$%).");
                         CliFormatter.printTypingEffect(CliFormatter.boldGreen("✔️ Ready to register? Follow the prompts below!"));
 
+
+
                         System.out.println("\n------------");
+
 
                         System.out.print(CliFormatter.boldPurple("Enter a username: "));
                         String username = scanner.nextLine();

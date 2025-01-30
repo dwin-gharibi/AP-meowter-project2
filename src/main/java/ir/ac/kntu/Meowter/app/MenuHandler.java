@@ -166,6 +166,9 @@ public class MenuHandler {
                                         displayPost(postRepository.findById((long) extractId(notification.getContent())));
                                     } else if (Objects.equals(notification.getType(), "FOLLOW")) {
                                         displayUserProfile(loggedInUser, userRepository.findById((long) extractId(notification.getContent())));
+                                    } else if (Objects.equals(notification.getType(), "MESSAGE")) {
+                                        MessageController messageController = new MessageController();
+                                        messageController.viewConversation(notification.getNotifiee(), notification.getNotifier());
                                     }
                                     break;
                                 case 2:

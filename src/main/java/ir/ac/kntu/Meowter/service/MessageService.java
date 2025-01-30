@@ -3,6 +3,8 @@ package ir.ac.kntu.Meowter.service;
 import ir.ac.kntu.Meowter.model.Message;
 import ir.ac.kntu.Meowter.model.User;
 import ir.ac.kntu.Meowter.repository.MessageRepository;
+import ir.ac.kntu.Meowter.util.CliFormatter;
+import ir.ac.kntu.Meowter.util.KafkaUtil;
 import ir.ac.kntu.Meowter.util.RabbitMQUtil;
 
 import java.util.HashSet;
@@ -12,10 +14,19 @@ import java.util.Set;
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final NotificationService notificationService;
+
 
     public MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         RabbitMQUtil.initializeQueue();
+        KafkaUtil kafkaUtil = new KafkaUtil(
+                "localhost:9092",
+                "localhost:9092",
+                "notification-group",
+                "notifications"
+        );
+        this.notificationService = new NotificationService(kafkaUtil, "notifications");
     }
 
     public void sendMessage(User sender, User recipient, String content) {
@@ -33,6 +44,8 @@ public class MessageService {
                 "{\"senderId\":%d,\"recipientId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\"}",
                 sender.getId(), recipient.getId(), content, message.getTimestamp());
         RabbitMQUtil.sendMessage(messagePayload);
+
+        notificationService.sendNotification(sender, recipient, "MESSAGE", "New message from " + CliFormatter.boldBlue("@" + sender.getUsername()) + " for you " + recipient.getUsername());
     }
 
     public List<Message> getMessagesBySender(User sender) {

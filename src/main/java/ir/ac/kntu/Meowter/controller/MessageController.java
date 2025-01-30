@@ -48,7 +48,7 @@ public class MessageController {
                 case 2 -> selectChatAndSendMessage(loggedInUser);
                 case 3 -> startNewChat(loggedInUser);
                 case 4 -> {
-                    System.out.println("Exiting messages...");
+                    System.out.println(CliFormatter.boldRed("Exiting messages..."));
                     return;
                 }
                 default -> System.out.println("Invalid choice. Please try again.");
@@ -120,8 +120,14 @@ public class MessageController {
         String username = scanner.nextLine();
         User recipient = userRepository.findByUsername(username);
 
+        CliFormatter.loadingSpinner("Getting user");
         if (recipient == null) {
             System.out.println(CliFormatter.boldRed("User not found."));
+            return;
+        }
+
+        if (!(recipient.getFollowers().contains(loggedInUser) && !recipient.getFollowing().contains(loggedInUser))) {
+            System.out.println(CliFormatter.boldRed("User not found or not follows you, so you cant send message!"));
             return;
         }
 
@@ -137,8 +143,14 @@ public class MessageController {
         System.out.println(CliFormatter.boldGreen("Chat started and message sent successfully."));
     }
 
-    private void viewConversation(User loggedInUser, User otherUser) {
+    public void viewConversation(User loggedInUser, User otherUser) {
         List<Message> messages = messageService.getConversation(loggedInUser, otherUser);
+
+        for (Message message : messages) {
+            if (message.getRecipient().getId() == loggedInUser.getId()) {
+               messageService.markMessageAsRead(message.getId());
+            }
+        }
 
         if (messages.isEmpty()) {
             System.out.println(CliFormatter.boldRed("No messages found with " + otherUser.getUsername()));
@@ -149,9 +161,9 @@ public class MessageController {
         for (Message message : messages) {
             System.out.printf("[%s] %s: %s (Read: %s)%n",
                     message.getTimestamp(),
-                    message.getSender().getUsername(),
-                    message.getContent(),
-                    message.isRead() ? "Yes" : "No");
+                    CliFormatter.boldBlue("@" + message.getSender().getUsername()),
+                    CliFormatter.boldPurple(message.getContent()),
+                    CliFormatter.boldYellow(message.isRead() ? "Yes" : "No"));
         }
     }
 }

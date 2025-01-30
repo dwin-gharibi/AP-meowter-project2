@@ -36,7 +36,7 @@ public class KafkaUtil {
     public void sendNotification(String topic, String message) {
         producer.send(new ProducerRecord<>(topic, message), (metadata, exception) -> {
             if (exception == null) {
-                System.out.println("Sent notification to Kafka topic: " + topic + ", message: " + message);
+                System.out.println(CliFormatter.boldBlue("Sent notification to Kafka topic: ") + CliFormatter.boldRed(topic) + CliFormatter.boldYellow(", message: ") + CliFormatter.boldRed(message));
             } else {
                 exception.printStackTrace();
             }
@@ -46,7 +46,7 @@ public class KafkaUtil {
     public void listenForNotifications(Consumer<String> messageProcessor) {
         try {
             consumer.subscribe(Collections.singletonList("notifications"));
-            System.out.println("Subscribed to topics: " + consumer.subscription());
+            System.out.println(CliFormatter.boldRed("Subscribed to topics: ") + consumer.subscription());
 
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
@@ -54,10 +54,8 @@ public class KafkaUtil {
                     messageProcessor.accept(record.value());
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            consumer.close();
+        } catch (Exception ignored) {
+
         }
     }
 

@@ -148,7 +148,7 @@ public class MessageController {
 
         for (Message message : messages) {
             if (message.getRecipient().getId() == loggedInUser.getId()) {
-               messageService.markMessageAsRead(message.getId());
+                messageService.markMessageAsRead(message.getId());
             }
         }
 

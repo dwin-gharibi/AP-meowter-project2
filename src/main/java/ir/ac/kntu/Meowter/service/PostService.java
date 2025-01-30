@@ -176,7 +176,10 @@ public class PostService {
         return postRepository.findByUser(user);
     }
 
-    public void addPost(User user, String content, boolean flagChecker, boolean flagDescribe, String labels) {
+    public void addPost(User user, String content, boolean[] flags, String labels) {
+        boolean flagChecker = flags[0];
+        boolean flagDescribe = flags[1];
+
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("User must not be null and must have a valid ID.");
         }

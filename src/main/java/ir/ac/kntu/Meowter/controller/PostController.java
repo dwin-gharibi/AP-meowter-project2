@@ -108,8 +108,8 @@ public class PostController {
 
         System.out.print(CliFormatter.boldBlue("- Do you want @AI to describe your post? "));
         boolean flagDescribe = scanner.nextBoolean();
-
-        postService.addPost(loggedInUser, content, flagChecker, flagDescribe, labels);
+        boolean[] flags = {flagChecker, flagDescribe};
+        postService.addPost(loggedInUser, content, flags, labels);
     }
 
     private void selectPost(User loggedInUser, Scanner scanner) {

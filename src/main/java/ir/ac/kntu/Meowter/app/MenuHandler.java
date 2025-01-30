@@ -174,6 +174,8 @@ public class MenuHandler {
                                 case 2:
                                     flag = false;
                                     break;
+                                default:
+                                    break;
                             }
                         }
                     case 8:
@@ -401,6 +403,8 @@ public class MenuHandler {
                             case "date":
                                 comparison = p1.getCreatedAt().compareTo(p2.getCreatedAt());
                                 break;
+                            default:
+                                break;
                         }
                         if (comparison != 0) {
                             return sortOrder ? comparison : -comparison;
@@ -441,15 +445,7 @@ public class MenuHandler {
     private void processComments(Set<Comment> comments, StringBuilder commentsDetails, int level) {
         String indentation = "    ".repeat(level);
         comments.forEach(comment -> {
-            commentsDetails.append(indentation)
-                    .append("- Comment by ")
-                    .append(CliFormatter.blue(comment.getUser().getUsername()))
-                    .append(": ")
-                    .append(CliFormatter.cyan(comment.getContent()))
-                    .append(" #")
-                    .append(CliFormatter.yellow(comment.getId().toString()))
-                    .append("\n");
-
+            commentsDetails.append(indentation).append("- Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append(" #").append(CliFormatter.yellow(comment.getId().toString())).append("\n");
             if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
                 processComments(comment.getReplies(), commentsDetails, level + 1);
             }
@@ -463,7 +459,6 @@ public class MenuHandler {
             System.out.print(CliFormatter.magenta("Choose an option: "));
             int choice_request = scanner.nextInt();
             scanner.nextLine();
-
             switch (choice_request) {
                 case 1:
                     postController.handleRequests(loggedInUser, scanner);
@@ -479,27 +474,21 @@ public class MenuHandler {
     private LocalDateTime[] setDateFilter(Scanner scanner) {
         System.out.print("Enter date filters: (YYYY-mm-dd|YYYY-mm-dd) \nNote: They can also be empty for open ranges.\n");
         String dateStr = scanner.nextLine();
-
         if (!dateStr.contains("|")) {
             System.out.println(CliFormatter.boldRed("Invalid date format."));
             return new LocalDateTime[]{null, null};
         }
-
         String start = dateStr.split("\\|")[0].trim();
         String end = dateStr.split("\\|")[1].trim();
-
         LocalDateTime start_date = start.isEmpty() ? null : DateConverter.convertStringToDate(start);
         LocalDateTime end_date = end.isEmpty() ? null : DateConverter.convertStringToDate(end);
-
         CliFormatter.progressBar(CliFormatter.boldYellow("Setting date filters ..."), 5);
-
         return new LocalDateTime[]{start_date, end_date};
     }
 
 
     public void displaySettings(User loggedInUser) {
         Scanner scanner = new Scanner(System.in);
-
         while (true) {
             System.out.println("Settings for: " + CliFormatter.boldGreen(loggedInUser.getUsername()));
             System.out.println("1. Change Username (" + CliFormatter.boldBlue(loggedInUser.getUsername()) + ")");
@@ -533,10 +522,8 @@ public class MenuHandler {
                     loggedInUser = userService.updatePrivacySetting(loggedInUser, isPrivate);
                     CliFormatter.printTypingEffect(CliFormatter.boldGreen("Privacy setting updated successfully."));
                     break;
-
                 case 4:
                     return;
-
                 default:
                     System.out.println(CliFormatter.boldRed("Invalid option. Please try again."));
             }

@@ -144,6 +144,9 @@ public class AdminMenuHandler {
                             case 3:
                                 flag = false;
                                 break;
+                            default:
+                                System.out.println(CliFormatter.red("Invalid option!"));
+                                break;
                         }
                     }
                     break;
@@ -267,7 +270,6 @@ public class AdminMenuHandler {
 
     private void viewAllUsers() {
         System.out.println(CliFormatter.boldYellow("List of all users:"));
-
         List<String> user_details = new ArrayList<>();
         userService.getAllUsers().forEach(user -> {
             if (user.isActive()) {
@@ -309,7 +311,6 @@ public class AdminMenuHandler {
     private void sendNotifications(User loggedInUser) {
         System.out.print("Enter notification message: ");
         String content = scanner.nextLine();
-
         for(User user : userService.getAllUsers()) {
             notificationService.sendNotification(loggedInUser, user, "ADMIN", content);
         }
@@ -320,12 +321,10 @@ public class AdminMenuHandler {
         System.out.print("Enter the username of the user to edit: ");
         String username = scanner.nextLine();
         User user = userService.searchUserByUsername(username);
-
         if (user == null) {
             System.out.println(CliFormatter.red("User not found."));
             return;
         }
-
         System.out.println(CliFormatter.boldGreen("Editing user: " + user.getUsername()));
         System.out.println(CliFormatter.boldPurple("1. Update Username"));
         System.out.println(CliFormatter.boldRed("2. Update Password"));
@@ -375,6 +374,7 @@ public class AdminMenuHandler {
                 return;
             default:
                 System.out.println(CliFormatter.red("Invalid option."));
+                break;
         }
     }
 
@@ -395,9 +395,7 @@ public class AdminMenuHandler {
 
     public void displayUserProfile(User selectedUser) {
         CliFormatter.loadingSpinner(CliFormatter.boldGreen("Getting user information and profile..."));
-
         StringBuilder profileDetails = new StringBuilder();
-
         profileDetails.append(CliFormatter.bold("👤 Username: ")).append(selectedUser.getUsername()).append("\n");
         profileDetails.append(CliFormatter.bold("📧 Email: ")).append(selectedUser.getEmail()).append("\n");
         profileDetails.append(CliFormatter.bold("📝 Bio: ")).append(selectedUser.getBio() == null ? CliFormatter.boldRed("No bio provided.") : selectedUser.getBio()).append("\n");
@@ -421,15 +419,11 @@ public class AdminMenuHandler {
 
                 posts.forEach(post -> {
                     String postDetail = "Post ID: #" + CliFormatter.blue(String.valueOf(post.getId())) + "\n" + "Content: " + CliFormatter.boldGreen(post.getContent()) + "\n" + "Created At: " + CliFormatter.boldBlue(post.getCreatedAt().toString()) + "\n" + "Likes: " + CliFormatter.yellow(String.valueOf(post.getLikes().size())) + "\n" + "Hashtags: " + (post.getHashtags().isEmpty() ? CliFormatter.red("No hashtags") : CliFormatter.cyan(post.getHashtags().toString())) + "\n" + "Comments:\n";
-
                     if (!post.getComments().isEmpty()) {
                         StringBuilder commentsDetails = new StringBuilder();
                         post.getComments().forEach(comment -> {
                             if (comment.getUser().isActive()) {
-                                commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent()))
-                                        .append(" #")
-                                        .append(CliFormatter.yellow(comment.getId().toString()))
-                                        .append("\n");
+                                commentsDetails.append("    - Comment by ").append(CliFormatter.blue(comment.getUser().getUsername())).append(": ").append(CliFormatter.cyan(comment.getContent())).append(" #").append(CliFormatter.yellow(comment.getId().toString())).append("\n");
                             } else {
                                 commentsDetails.append(CliFormatter.boldRed("    - Comment hidden because user is inactive ")).append("\n");
                             }
@@ -452,11 +446,9 @@ public class AdminMenuHandler {
         System.out.println("1. Generate Users Report");
         System.out.println("2. Generate Posts Report");
         System.out.println("3. Back");
-
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
-
         switch (choice) {
             case 1:
                 generateUsersReport();
@@ -475,7 +467,6 @@ public class AdminMenuHandler {
         List<User> users = userService.getAllUsers();
         List<String> headers = List.of("User ID", "Username", "Email", "Status");
         List<List<String>> data = new ArrayList<>();
-
         for (User user : users) {
             data.add(List.of(
                     String.valueOf(user.getId()),
@@ -484,7 +475,6 @@ public class AdminMenuHandler {
                     user.isActive() ? "Active" : "Deactive"
             ));
         }
-
         String reportPath = HtmlReportGeneratorUtil.generateReport("Users Report", headers, data);
         System.out.println(CliFormatter.green("Users Report generated: " + reportPath));
     }
@@ -493,7 +483,6 @@ public class AdminMenuHandler {
         List<Post> posts = postService.getAllPosts();
         List<String> headers = List.of("Post ID", "Author", "Content", "Created Date");
         List<List<String>> data = new ArrayList<>();
-
         posts.forEach(post -> {
             data.add(List.of(
                     String.valueOf(post.getId()),
@@ -502,7 +491,6 @@ public class AdminMenuHandler {
                     post.getCreatedAt().toString()
             ));
         });
-
         String reportPath = HtmlReportGeneratorUtil.generateReport("Posts Report", headers, data);
         System.out.println(CliFormatter.green("Posts Report generated: " + reportPath));
     }
